@@ -13,9 +13,9 @@ namespace Automate.Services
             users = mongoDBService.GetCollection<User>("Users");
         }
 
-        public User Authenticate(string? username, string? password)
+        public User? Authenticate(string? username, string? password)
         {
-            var user = users.Find(u => u.Username == username && u.Password == password).FirstOrDefault();
+            User? user = users.Find(u => u.Username == username && u.Password == password).FirstOrDefault();
             return user;
         }
 
