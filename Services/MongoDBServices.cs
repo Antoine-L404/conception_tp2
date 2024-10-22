@@ -4,17 +4,17 @@ namespace Automate.Services
 {
     public class MongoDBServices
     {
-        private readonly IMongoDatabase _database;
+        private readonly IMongoDatabase mongoDatabase;
 
         public MongoDBServices(string databaseName)
         {
-            var client = new MongoClient("mongodb://localhost:27017");
-            _database = client.GetDatabase(databaseName);
+            MongoClient client = new MongoClient("mongodb://localhost:27017");
+            mongoDatabase = client.GetDatabase(databaseName);
         }
 
         public IMongoCollection<T> GetCollection<T>(string collectionName)
         {
-            return _database.GetCollection<T>(collectionName);
+            return mongoDatabase.GetCollection<T>(collectionName);
         }
     }
 }
