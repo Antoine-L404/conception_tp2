@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using Automate.Utils.Constants;
 
 namespace Automate.Services
 {
@@ -8,7 +9,7 @@ namespace Automate.Services
 
         public MongoDBServices(string databaseName)
         {
-            MongoClient client = new MongoClient("mongodb://localhost:27017");
+            MongoClient client = new MongoClient(DBConstants.DB_URL);
             mongoDatabase = client.GetDatabase(databaseName);
         }
 
