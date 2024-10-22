@@ -23,7 +23,7 @@ namespace Automate.ViewModels
         private string? _password;
         private readonly MongoDBServices _mongoService;
         private readonly UserServices userServices;
-        private readonly NavigationService _navigationService;
+        private readonly NavigationUtils _navigationService;
         //référence à la vue
         private Window _window;
 
@@ -47,7 +47,7 @@ namespace Automate.ViewModels
             userServices = new UserServices(_mongoService);
             AuthenticateCommand = new RelayCommand(Authenticate);
 
-            _navigationService = new NavigationService();
+            _navigationService = new NavigationUtils();
             _window = openedWindow;
 
         }
