@@ -1,4 +1,5 @@
-﻿using Automate.Utils;
+﻿using Automate.Services;
+using Automate.Utils;
 using Automate.Views;
 using System;
 using System.Collections;
@@ -20,7 +21,8 @@ namespace Automate.ViewModels
         //Propriétés du ViewModel
         private string? _username;
         private string? _password;
-        private readonly MongoDBService _mongoService;
+        private readonly MongoDBServices _mongoService;
+        private readonly UserServices userServices;
         private readonly NavigationService _navigationService;
         //référence à la vue
         private Window _window;
@@ -41,7 +43,8 @@ namespace Automate.ViewModels
         public LoginViewModel(Window openedWindow)
         {
             //instanciation de la BD
-            _mongoService = new MongoDBService("AutomateDB");
+            _mongoService = new MongoDBServices("AutomateDB");
+            userServices = new UserServices(_mongoService);
             AuthenticateCommand = new RelayCommand(Authenticate);
 
             _navigationService = new NavigationService();
@@ -102,7 +105,7 @@ namespace Automate.ViewModels
 
             if (!HasErrors)
             {
-                var user = _mongoService.Authenticate(Username, Password);
+                var user = userServices.Authenticate(Username, Password);
                 if (user == null)
                 {
                     AddError("Username", "Nom d'utilisateur ou mot de passe invalide");

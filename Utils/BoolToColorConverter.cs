@@ -17,5 +17,10 @@ namespace Automate.Utils
             }
             return Brushes.Transparent;
         }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Brushes.Transparent;
+        }
     }
 }
