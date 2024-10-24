@@ -10,6 +10,7 @@ namespace Automate.Models
     {
         [BsonId]
         public ObjectId Id { get; set; }
+        //TODO validate the set is not useless
 
         [BsonElement("Username")]
         public string Username { 
