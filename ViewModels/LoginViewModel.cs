@@ -5,7 +5,6 @@ using Automate.Utils.Constants;
 using Automate.Views;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -26,14 +25,15 @@ namespace Automate.ViewModels
         
         private Window window;
 
-        private Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+        private ErrorUtils errorUtils;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         public ICommand AuthenticateCommand { get; }
-        public bool HasErrors => errors.Count > 0;
-        public bool HasPasswordErrors => errors.ContainsKey(nameof(Password)) && errors[nameof(Password)].Any();
+        public bool HasErrors => errorUtils.errors.Count > 0;
+        public bool HasPasswordErrors => 
+            errorUtils.errors.ContainsKey(nameof(Password)) && errorUtils.errors[nameof(Password)].Any();
 
         public LoginViewModel(Window openedWindow)
         {
@@ -42,6 +42,8 @@ namespace Automate.ViewModels
             AuthenticateCommand = new RelayCommand(Authenticate);
 
             navigationUtils = new NavigationUtils();
+
+            errorUtils = new ErrorUtils();
 
             window = openedWindow;
         }
@@ -53,7 +55,7 @@ namespace Automate.ViewModels
             {
                 username = value;
                 OnPropertyChanged(nameof(Username));
-                ValidateProperty(nameof(Username));
+                ValidateUsername();
             }
         }
 
@@ -64,24 +66,13 @@ namespace Automate.ViewModels
             {
                 password = value;
                 OnPropertyChanged(nameof(Password));
-                ValidateProperty(nameof(Password));
+                ValidatePassword();
             }
         }
 
         public string ErrorMessages
         {
-            get
-            {
-                var allErrors = new List<string>();
-                foreach (var errorList in errors.Values)
-                {
-                    allErrors.AddRange(errorList);
-                }
-                // Retirer les chaînes vides et nulles
-                allErrors.RemoveAll(error => string.IsNullOrWhiteSpace(error));
-
-                return string.Join("\n", allErrors); // Joint les erreurs par une nouvelle ligne
-            }
+            get => errorUtils.GetAllErrorMessages();
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -89,95 +80,64 @@ namespace Automate.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        public IEnumerable GetErrors(string? propertyName) => errorUtils.GetErrors(propertyName);
+
         public void Authenticate()
         {
-            ValidateProperty(nameof(Username));
-            ValidateProperty(nameof(Password));
+            ValidateUsername();
+            ValidatePassword();
 
             if (!HasErrors)
             {
                 var user = userServices.Authenticate(Username, Password);
                 if (user == null)
                 {
-                    AddError("Username", "Nom d'utilisateur ou mot de passe invalide");
-                    AddError("Password", "");
+                    errorUtils.AddError(nameof(Username), "Nom d'utilisateur ou mot de passe invalide", ErrorsChanged);
+                    NotifyErrorChange();
                     Trace.WriteLine("invalid");
                 }
                 else
                 {
-                    navigationUtils.NavigateTo<AccueilWindow>();
-                    navigationUtils.Close(window);
+                    navigationUtils.NavigateToAndCloseCurrentWindow<AccueilWindow>(window);
                     Trace.WriteLine("logged in");
                 }
-
             }
         }
 
-        private void ValidateProperty(string? propertyName)
+        private void NotifyErrorChange()
         {
-            switch (propertyName)
-            {
-                case nameof(Username):
-                    if (string.IsNullOrEmpty(Username))
-                    {
-                        AddError(nameof(Username), "Le nom d'utilisateur ne peut pas être vide.");
-                    }
-                    else
-                    {
-                        RemoveError(nameof(Username));
-                    }
-                    break;
-
-                case nameof(Password):
-                    if (string.IsNullOrEmpty(Password))
-                    {
-                        AddError(nameof(Password), "Le mot de passe ne peut pas être vide.");
-                    }
-                    else
-                    {
-                        RemoveError(nameof(Password));
-                    }
-                    break;
-            }
-        }
-
-        private void AddError(string propertyName, string errorMessage)
-        {
-            if (!errors.ContainsKey(propertyName))
-            {
-                errors[propertyName] = new List<string>();
-            }
-            if (!errors[propertyName].Contains(errorMessage))
-            {
-                errors[propertyName].Add(errorMessage);
-               ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-            }
-            // Notifier les changements des propriétés
             OnPropertyChanged(nameof(ErrorMessages));
             OnPropertyChanged(nameof(HasPasswordErrors));
         }
 
-        private void RemoveError(string propertyName)
+        #region Validation
+        private void ValidateUsername()
         {
-            if (errors.ContainsKey(propertyName))
+            if (string.IsNullOrEmpty(Username))
             {
-                errors.Remove(propertyName);
-               ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName)); 
+                errorUtils.AddError(nameof(Username), "Le nom d'utilisateur ne peut pas être vide.", ErrorsChanged);
+                NotifyErrorChange();
             }
-            // Notifier les changements des propriétés
-            OnPropertyChanged(nameof(ErrorMessages));
-            OnPropertyChanged(nameof(HasPasswordErrors));
+            else
+            {
+                errorUtils.RemoveError(nameof(Username), ErrorsChanged);
+                NotifyErrorChange();
+            }
         }
 
-        public IEnumerable GetErrors(string? propertyName)
+        private void ValidatePassword()
         {
-            if (string.IsNullOrEmpty(propertyName) || !errors.ContainsKey(propertyName))
+            if (string.IsNullOrEmpty(Password))
             {
-                return Enumerable.Empty<string>();
+                errorUtils.AddError(nameof(Password), "Le mot de passe ne peut pas être vide.", ErrorsChanged);
+                NotifyErrorChange();
             }
-
-            return errors[propertyName];
+            else
+            {
+                errorUtils.RemoveError(nameof(Password), ErrorsChanged);
+                NotifyErrorChange();
+            }
         }
-
+        #endregion
     }
 }
