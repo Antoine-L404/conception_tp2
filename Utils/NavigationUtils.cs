@@ -10,6 +10,12 @@ namespace Automate.Utils
             window.Show();
         }
 
+        public void NavigateToAndCloseCurrentWindow<T>(Window currentWindow) where T : Window, new()
+        {
+            NavigateTo<T>();
+            Close(currentWindow);
+        }
+
         public void Close(Window window)
         {
             window.Close();
