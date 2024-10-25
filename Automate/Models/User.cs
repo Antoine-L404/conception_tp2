@@ -14,59 +14,46 @@ namespace Automate.Models
 
         [BsonElement("Username")]
         public string Username { 
-            get
-            {
-                return Username;
-            } 
+            get => Username;
             set 
             {
                 ArgumentNullException.ThrowIfNull(value);
-                if (value.Length > 0) 
-                {
-                    Username = value;   
-                }
-                else
+                if (value.Trim().Length == 0) 
                 {
                     throw new ArgumentException();
                 }
+
+                Username = value;
             }
         }
 
         [BsonElement("Password")]
         public string Password {
-            get
-            {
-                return Password;
-            }
+            get => Password;
             set
             {
                 ArgumentNullException.ThrowIfNull(value);
-                if (!Regex.IsMatch(Password, "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?.&])[A-Za-z\\d@$!%*?.&]{8,}$/"))
+                if (!Regex.IsMatch(Password, "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?.&])[A-Za-z\\d@$!%*?.&]{8,}$/") 
+                    || value.Trim().Length <= 0)
                 {
                     throw new ArgumentException();
                 }
-                if (value.Length <= 0)
-                {
-                    throw new ArgumentException();
-                }
+
                 Password = value;
             }
         }
 
         [BsonElement("Role")]
         public string Role {
-            get
-            {
-                return Role;
-            }
+            get => Role;
             set
             {
-                
                 ArgumentNullException.ThrowIfNull(value);
                 if (value != RoleConstant.ADMIN && value != RoleConstant.EMPLOYEES)
                 {
                     throw new ArgumentException();
                 }
+
                 Role = value;
             } 
         }
