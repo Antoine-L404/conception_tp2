@@ -7,7 +7,6 @@
         xmlns:utils="clr-namespace:Automate.Utils"
         xmlns:sys="clr-namespace:System;assembly=mscorlib" 
         xmlns:viewmodels="clr-namespace:Automate.ViewModels" 
-        d:DataContext="{d:DesignInstance Type=viewmodels:LoginViewModel}"
         mc:Ignorable="d"
         Title="LoginWindow" Height="450" Width="800"
         xmlns:ui="http://schemas.modernwpf.com/2019"
