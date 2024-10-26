@@ -4,18 +4,20 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Automate.Utils
+namespace Automate.Utils.Validation
 {
-    public class ErrorUtils
+    public class ErrorsCollection
     {
-        public Dictionary<string, List<string>> errors;
+        private Dictionary<string, List<string>> errors;
+        private EventHandler<DataErrorsChangedEventArgs>? errorsChangedEvent;
 
-        public ErrorUtils() 
+        public ErrorsCollection(EventHandler<DataErrorsChangedEventArgs>? errorsChangedEvent)
         {
             errors = new Dictionary<string, List<string>>();
+            this.errorsChangedEvent = errorsChangedEvent;
         }
 
-        public void AddError(string propertyName, string errorMessage, EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged)
+        public void AddError(string propertyName, string errorMessage)
         {
             if (!errors.ContainsKey(propertyName))
             {
@@ -24,16 +26,16 @@ namespace Automate.Utils
             if (!errors[propertyName].Contains(errorMessage))
             {
                 errors[propertyName].Add(errorMessage);
-                ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+                errorsChangedEvent?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
             }
         }
 
-        public void RemoveError(string propertyName, EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged)
+        public void RemoveError(string propertyName)
         {
             if (errors.ContainsKey(propertyName))
             {
                 errors.Remove(propertyName);
-                ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+                errorsChangedEvent?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
             }
         }
 
@@ -59,5 +61,9 @@ namespace Automate.Utils
 
             return string.Join("\n", allErrors);
         }
+
+        public bool ContainsAnyError() => errors.Count > 0;
+
+        public bool ContainsError(string key) => errors.ContainsKey(key) && errors[key].Any();
     }
 }

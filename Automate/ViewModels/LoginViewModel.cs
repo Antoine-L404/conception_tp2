@@ -2,12 +2,12 @@
 using Automate.Services.Commands;
 using Automate.Utils;
 using Automate.Utils.Constants;
+using Automate.Utils.Validation;
 using Automate.Views;
 using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -25,15 +25,14 @@ namespace Automate.ViewModels
         
         private Window window;
 
-        private ErrorUtils errorUtils;
+        private ErrorsCollection errorsCollection;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         public ICommand AuthenticateCommand { get; }
-        public bool HasErrors => errorUtils.errors.Count > 0;
-        public bool HasPasswordErrors => 
-            errorUtils.errors.ContainsKey(nameof(Password)) && errorUtils.errors[nameof(Password)].Any();
+        public bool HasErrors => errorsCollection.ContainsAnyError();
+        public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(Password));
 
         public LoginViewModel(Window openedWindow)
         {
@@ -43,7 +42,7 @@ namespace Automate.ViewModels
 
             navigationUtils = new NavigationUtils();
 
-            errorUtils = new ErrorUtils();
+            errorsCollection = new ErrorsCollection(ErrorsChanged);
 
             window = openedWindow;
         }
@@ -72,7 +71,7 @@ namespace Automate.ViewModels
 
         public string ErrorMessages
         {
-            get => errorUtils.GetAllErrorMessages();
+            get => errorsCollection.GetAllErrorMessages();
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -80,7 +79,7 @@ namespace Automate.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public IEnumerable GetErrors(string? propertyName) => errorUtils.GetErrors(propertyName);
+        public IEnumerable GetErrors(string? propertyName) => errorsCollection.GetErrors(propertyName);
 
         public void Authenticate()
         {
@@ -92,7 +91,7 @@ namespace Automate.ViewModels
                 var user = userServices.Authenticate(Username, Password);
                 if (user == null)
                 {
-                    errorUtils.AddError(nameof(Username), "Nom d'utilisateur ou mot de passe invalide", ErrorsChanged);
+                    errorsCollection.AddError(nameof(Username), "Nom d'utilisateur ou mot de passe invalide");
                     NotifyErrorChange();
                     Trace.WriteLine("invalid");
                 }
@@ -110,34 +109,24 @@ namespace Automate.ViewModels
             OnPropertyChanged(nameof(HasPasswordErrors));
         }
 
-        #region Validation
         private void ValidateUsername()
         {
-            if (string.IsNullOrEmpty(Username))
-            {
-                errorUtils.AddError(nameof(Username), "Le nom d'utilisateur ne peut pas être vide.", ErrorsChanged);
-                NotifyErrorChange();
-            }
-            else
-            {
-                errorUtils.RemoveError(nameof(Username), ErrorsChanged);
-                NotifyErrorChange();
-            }
+            CommonValidation.validateNullOrEmpty(
+                nameof(Username), 
+                Username, 
+                "Le nom d'utilisateur ne peut pas être vide.", 
+                errorsCollection, 
+                NotifyErrorChange);
         }
 
         private void ValidatePassword()
         {
-            if (string.IsNullOrEmpty(Password))
-            {
-                errorUtils.AddError(nameof(Password), "Le mot de passe ne peut pas être vide.", ErrorsChanged);
-                NotifyErrorChange();
-            }
-            else
-            {
-                errorUtils.RemoveError(nameof(Password), ErrorsChanged);
-                NotifyErrorChange();
-            }
+            CommonValidation.validateNullOrEmpty(
+                nameof(Password), 
+                Password,
+                "Le mot de passe ne peut pas être vide.", 
+                errorsCollection,
+                NotifyErrorChange);
         }
-        #endregion
     }
 }
