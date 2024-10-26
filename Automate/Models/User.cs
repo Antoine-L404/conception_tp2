@@ -49,7 +49,7 @@ namespace Automate.Models
             set
             {
                 ArgumentNullException.ThrowIfNull(value);
-                if (value != RoleConstant.ADMIN && value != RoleConstant.EMPLOYEES)
+                if (value != RoleConstant.ADMIN && value != RoleConstant.EMPLOYEE)
                 {
                     throw new ArgumentException();
                 }
