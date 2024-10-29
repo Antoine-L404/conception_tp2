@@ -33,6 +33,7 @@ namespace Automate.Models
             set
             {
                 ArgumentNullException.ThrowIfNull(value);
+                // Vérifie que le mot de passe contient au moins une minuscule, une majuscule, un chiffre, un caractère spécial et une longueur minimale de 8 caractères.
                 if (!Regex.IsMatch(Password, "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?.&])[A-Za-z\\d@$!%*?.&]{8,}$/") 
                     || value.Trim().Length <= 0)
                 {
