@@ -1,4 +1,5 @@
-﻿using Automate.Services;
+﻿using Automate.Models;
+using Automate.Services;
 using Automate.Services.Commands;
 using Automate.Utils;
 using Automate.Utils.Constants;
@@ -86,20 +87,20 @@ namespace Automate.ViewModels
             ValidateUsername();
             ValidatePassword();
 
-            if (!HasErrors)
+            if (HasErrors)
+                return;
+
+            User? user = userServices.Authenticate(Username!, Password!);
+            if (user == null)
             {
-                var user = userServices.Authenticate(Username, Password);
-                if (user == null)
-                {
-                    errorsCollection.AddError(nameof(Username), "Nom d'utilisateur ou mot de passe invalide");
-                    NotifyErrorChange();
-                    Trace.WriteLine("invalid");
-                }
-                else
-                {
-                    navigationUtils.NavigateToAndCloseCurrentWindow<AccueilWindow>(window);
-                    Trace.WriteLine("logged in");
-                }
+                errorsCollection.AddError(nameof(Username), "Nom d'utilisateur ou mot de passe invalide");
+                NotifyErrorChange();
+                Trace.WriteLine("invalid");
+            }
+            else
+            {
+                navigationUtils.NavigateToAndCloseCurrentWindow<AccueilWindow>(window);
+                Trace.WriteLine("logged in");
             }
         }
 
