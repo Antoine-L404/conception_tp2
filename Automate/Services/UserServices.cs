@@ -2,6 +2,7 @@
 using BC = BCrypt.Net.BCrypt;
 using MongoDB.Driver;
 using System.Linq;
+using Automate.Utils.Constants;
 
 namespace Automate.Services
 {
@@ -11,14 +12,20 @@ namespace Automate.Services
 
         public UserServices(MongoDBServices mongoDBService)
         {
-            users = mongoDBService.GetCollection<User>("Users");
+            users = mongoDBService.GetCollection<User>(DBConstants.USERS_COLLECTION_NAME);
         }
 
         public User? Authenticate(string username, string password)
         {
-            User? user = users.Find(u => u.Username == username && u.Password == HashPassword(password)).FirstOrDefault();
+            User? user = users.Find(u => u.Username == username).FirstOrDefault();
+
+            if (!VerifyPassword(password, user.Password))
+                return null;
+
             return user;
         }
+
+        public bool VerifyPassword(string password, string hashPassword) => BC.Verify(password, hashPassword);
 
         public string HashPassword(string password) => BC.HashPassword(password);
 
