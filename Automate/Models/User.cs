@@ -15,10 +15,10 @@ namespace Automate.Models
         [BsonElement("Username")]
         public string Username {
             //get => Username;
-            //set 
+            //set
             //{
             //    ArgumentNullException.ThrowIfNull(value);
-            //    if (value.Trim().Length == 0) 
+            //    if (value.Trim().Length == 0)
             //    {
             //        throw new ArgumentException();
             //    }
@@ -30,36 +30,36 @@ namespace Automate.Models
 
         [BsonElement("Password")]
         public string Password {
-            //get => Password;
-            //set
-            //{
-            //    ArgumentNullException.ThrowIfNull(value);
-            //    // Vérifie que le mot de passe contient au moins une minuscule, une majuscule, un chiffre, un caractère spécial et une longueur minimale de 8 caractères.
-            //    if (!Regex.IsMatch(Password, "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?.&])[A-Za-z\\d@$!%*?.&]{8,}$/") 
-            //        || value.Trim().Length <= 0)
-            //    {
-            //        throw new ArgumentException();
-            //    }
+            get => Password;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+                // Vérifie que le mot de passe contient au moins une minuscule, une majuscule, un chiffre, un caractère spécial et une longueur minimale de 8 caractères.
+                if (!Regex.IsMatch(Password, "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?.&])[A-Za-z\\d@$!%*?.&]{8,}$/")
+                    || value.Trim().Length <= 0)
+                {
+                    throw new ArgumentException();
+                }
 
-            //    Password = value;
-            //}
-            get; set;
+                Password = value;
+            }
+            //get; set;
         }
 
         [BsonElement("Role")]
         public string Role {
-            //get => Role;
-            //set
-            //{
-            //    ArgumentNullException.ThrowIfNull(value);
-            //    if (value != RoleConstant.ADMIN && value != RoleConstant.EMPLOYEE)
-            //    {
-            //        throw new ArgumentException();
-            //    }
+            get => Role;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+                if (value != RoleConstant.ADMIN && value != RoleConstant.EMPLOYEE)
+                {
+                    throw new ArgumentException();
+                }
 
-            //    Role = value;
-            //} 
-            get; set;
+                Role = value;
+            }
+            //get; set;
         }
     }
 }
