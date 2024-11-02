@@ -87,13 +87,17 @@ public class CalendarCommand : ICommand
     private static T FindParent<T>(DependencyObject child) where T : DependencyObject
     {
         DependencyObject parentObject = VisualTreeHelper.GetParent(child);
-        if (parentObject == null) return null;
-        if (parentObject is T parent) return parent;
+        if (parentObject == null)
+            return null;
+        if (parentObject is T parent)
+            return parent;
         return FindParent<T>(parentObject);
     }
 
-    private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+    private static List<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
     {
+        var results = new List<T>();
+
         if (depObj != null)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
@@ -101,16 +105,16 @@ public class CalendarCommand : ICommand
                 DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
                 if (child != null && child is T tChild)
                 {
-                    yield return tChild;
+                    results.Add(tChild);
                 }
 
-                foreach (T childOfChild in FindVisualChildren<T>(child))
-                {
-                    yield return childOfChild;
-                }
+                results.AddRange(FindVisualChildren<T>(child));
             }
         }
+
+        return results;
     }
+
 
     public event EventHandler CanExecuteChanged;
 }
