@@ -24,6 +24,9 @@ namespace Automate.Views
         private void CalendarLoaded(object sender, RoutedEventArgs e)
         {
             _calendarCommand.Execute(myCalendar);
+
+            selectedDate = DateTime.Today;
+            _calendarCommand.ShowTaskDetails(selectedDate.Value);
         }
 
         private void OnCalendarDateClicked(object sender, MouseButtonEventArgs e)
@@ -31,6 +34,7 @@ namespace Automate.Views
             if (myCalendar.SelectedDate.HasValue)
             {
                 selectedDate = myCalendar.SelectedDate.Value;
+                _calendarCommand.ShowTaskDetails(selectedDate.Value); 
             }
         }
 
@@ -43,16 +47,17 @@ namespace Automate.Views
 
                 if (eventForm.IsConfirmed)
                 {
-                    // Création d'un nouvel événement et ajout à la liste
                     var newTask = new UpcomingTask
                     {
                         Title = eventForm.SelectedEventType,
                         EventDate = eventForm.EventDate
                     };
 
-                    // Ajout de l'événement et rafraîchissement du calendrier
                     _calendarCommand.AddEvent(newTask);
+                    _calendarCommand.Execute(myCalendar); 
                     MessageBox.Show($"Événement '{eventForm.SelectedEventType}' ajouté pour le {eventForm.EventDate.ToShortDateString()}");
+
+                    _calendarCommand.ShowTaskDetails(eventForm.EventDate);
                 }
             }
             else
@@ -70,9 +75,10 @@ namespace Automate.Views
 
                 if (eventForm.IsConfirmed)
                 {
-                    // Logique de mise à jour de l'événement
                     MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
-                    _calendarCommand.Execute(myCalendar); // Rafraîchir les dates si nécessaire
+
+                    _calendarCommand.Execute(myCalendar); 
+                    _calendarCommand.ShowTaskDetails(eventForm.EventDate);
                 }
             }
             else
@@ -80,5 +86,6 @@ namespace Automate.Views
                 MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
     }
 }

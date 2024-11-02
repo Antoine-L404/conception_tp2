@@ -44,8 +44,10 @@ public class CalendarCommand : ICommand
     public void AddEvent(UpcomingTask newTask)
     {
         tasks.Add(newTask);
-        HighlightEventDates(); // Rafraîchir pour afficher les nouvelles dates en rouge
+        HighlightEventDates(); 
+        ShowTaskDetails(newTask.EventDate); 
     }
+
 
     private void HighlightEventDates()
     {
@@ -72,7 +74,7 @@ public class CalendarCommand : ICommand
         }
     }
 
-    private void ShowTaskDetails(DateTime selectedDate)
+    public void ShowTaskDetails(DateTime selectedDate)
     {
         var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
         if (upcomingTask != null)
@@ -86,6 +88,7 @@ public class CalendarCommand : ICommand
             EventDate.Text = "";
         }
     }
+
 
     private static T FindParent<T>(DependencyObject child) where T : DependencyObject
     {
