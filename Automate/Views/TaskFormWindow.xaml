@@ -1,0 +1,33 @@
+﻿<Window x:Class="Automate.Views.TaskFormWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Automate.Views"
+        mc:Ignorable="d"
+        Title="TaskFormWindow" Height="450" Width="800">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock Text="Ajouter / Modifier Événement" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Type d'événement"/>
+            <ComboBox x:Name="eventTypeComboBox" Width="200">
+                <ComboBoxItem Content="Semis"/>
+                <ComboBoxItem Content="Rempotage"/>
+                <ComboBoxItem Content="Entretien (désherbage/taille/fertilisation)"/>
+                <ComboBoxItem Content="Arrosage"/>
+                <ComboBoxItem Content="Récolte"/>
+                <ComboBoxItem Content="Commandes"/>
+                <ComboBoxItem Content="Événements spéciaux (visites/formations/etc.)"/>
+            </ComboBox>
+
+            <TextBlock Text="Date de l'événement" Margin="0,10,0,0"/>
+            <TextBox x:Name="eventDateTextBox" IsReadOnly="True" Width="200" />
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Ajouter" Width="75" Margin="5" Click="OnAddButtonClick"/>
+                <Button Content="Annuler" Width="75" Margin="5" Click="OnCancelButtonClick"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
