@@ -12,11 +12,8 @@
                     VerticalAlignment="Center">
             <Calendar Margin="20" SelectionMode="MultipleRange"
                       x:Name="myCalendar"
-                      IsTodayHighlighted="false" 
+                      IsTodayHighlighted="True" 
                       xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                <Calendar.SelectedDates>
-                    <sys:DateTime>10/29/2024</sys:DateTime>
-                </Calendar.SelectedDates>
             </Calendar>
         </StackPanel>
     </Grid>
