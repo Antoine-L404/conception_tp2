@@ -41,6 +41,12 @@ public class CalendarCommand : ICommand
         }
     }
 
+    public void AddEvent(UpcomingTask newTask)
+    {
+        tasks.Add(newTask);
+        HighlightEventDates(); // Rafraîchir pour afficher les nouvelles dates en rouge
+    }
+
     private void HighlightEventDates()
     {
         if (Calendar == null) return;

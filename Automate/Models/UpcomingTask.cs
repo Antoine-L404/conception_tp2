@@ -4,10 +4,7 @@ using System;
 
 namespace Automate.Models
 {
-    /// <summary>
-    /// Nous ne pouvons pas nommer la classe Task, car elle entre en conflit avec System.Threading.Tasks.Task
-    /// </summary>
-    class UpcomingTask
+    public class UpcomingTask
     {
         [BsonId]
         public ObjectId Id { get; set; }
