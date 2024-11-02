@@ -7,8 +7,8 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Calendar x:Name="myCalendar" Margin="20" SelectionMode="SingleDate"
                       IsTodayHighlighted="True"
-                      Loaded="MyCalendar_Loaded" 
-                PreviewMouseLeftButtonDown="MyCalendar_PreviewMouseLeftButtonDown">
+                      Loaded="CalendarLoaded" 
+                PreviewMouseLeftButtonDown="OnCalendarDateClicked">
             </Calendar>
 
             <Popup Name="myPopup" Placement="Left" StaysOpen="True">

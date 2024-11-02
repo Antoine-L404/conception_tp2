@@ -1,4 +1,4 @@
-﻿using Automate.Commands;
+﻿using Automate.Services.Commands;
 
 namespace Automate.ViewModels
 {

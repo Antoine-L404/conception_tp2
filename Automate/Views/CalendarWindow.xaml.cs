@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media;
-using Automate.Commands;
+using System.Windows.Input;
+using Automate.Services.Commands;
 
 namespace Automate.Views
 {
@@ -14,34 +12,23 @@ namespace Automate.Views
         public CalendarWindow()
         {
             InitializeComponent();
-            _calendarCommand = new CalendarCommand();
+            _calendarCommand = new CalendarCommand
+            {
+                Calendar = myCalendar,
+                Popup = myPopup,
+                PopupTitle = myPopupTitle,
+                PopupText = myPopupText
+            };
         }
 
-        private void MyCalendar_Loaded(object sender, RoutedEventArgs e)
+        private void CalendarLoaded(object sender, RoutedEventArgs e)
         {
             _calendarCommand.Execute(myCalendar);
         }
 
-        private void MyCalendar_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void OnCalendarDateClicked(object sender, MouseButtonEventArgs e)
         {
-            // Permet de trouvé la case sélectionner dans un calendar de XAML
-            var calendarDayButton = FindParent<CalendarDayButton>(e.OriginalSource as DependencyObject);
-
-            if (calendarDayButton != null && calendarDayButton.DataContext is DateTime selectedDate)
-            {
-                _calendarCommand.Execute(new Tuple<Calendar, Popup, TextBlock, TextBlock, DateTime>(
-                    myCalendar, myPopup, myPopupTitle, myPopupText, selectedDate));
-
-                e.Handled = true;
-            }
+            _calendarCommand.Execute(e);
         }
-        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
-        {
-            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
-            if (parentObject == null) return null;
-            if (parentObject is T parent) return parent;
-            return FindParent<T>(parentObject);
-        }
-
     }
 }

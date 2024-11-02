@@ -1,95 +1,116 @@
-﻿using System;
+﻿using Automate.Models;
 using System.Collections.Generic;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
-using Automate.Models;
-using Automate.Services.Commands;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows;
+using System;
 
-namespace Automate.Commands
+public class CalendarCommand : ICommand
 {
-    public class CalendarCommand : ICommand
+    private readonly List<UpcomingTask> tasks;
+
+    public Calendar Calendar { get; set; }
+    public Popup Popup { get; set; }
+    public TextBlock PopupTitle { get; set; }
+    public TextBlock PopupText { get; set; }
+
+    public CalendarCommand()
     {
-        private readonly List<UpcomingTask> tasks;
-
-        public CalendarCommand()
+        tasks = new List<UpcomingTask>
         {
-            tasks = new List<UpcomingTask>
-            {
-                new UpcomingTask { Title = "Event 1", EventDate = new DateTime(2024, 11, 10) },
-                new UpcomingTask { Title = "Event 2", EventDate = new DateTime(2024, 11, 12) },
-                new UpcomingTask { Title = "Event 3", EventDate = new DateTime(2024, 11, 15) },
-                new UpcomingTask { Title = "Event 4", EventDate = new DateTime(2024, 11, 20) },
-                new UpcomingTask { Title = "Event 5", EventDate = new DateTime(2024, 11, 30) }
-            };
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return parameter is Calendar || parameter is Tuple<Calendar, Popup, TextBlock, TextBlock, DateTime>;
-        }
-
-        public void Execute(object parameter)
-        {
-            if (parameter is Calendar calendar)
-            {
-                HighlightEventDates(calendar);
-            }
-            else if (parameter is Tuple<Calendar, Popup, TextBlock, TextBlock, DateTime> context)
-            {
-                ShowTaskPopup(context.Item1, context.Item2, context.Item3, context.Item4, context.Item5);
-            }
-        }
-
-        private void HighlightEventDates(Calendar calendar)
-        {
-            foreach (var calendarDayButton in FindVisualChildren<CalendarDayButton>(calendar))
-            {
-                if (calendarDayButton.DataContext is DateTime date)
-                {
-                    var isEvent = tasks.Exists(t => t.EventDate.Date == date.Date);
-                    calendarDayButton.Background = isEvent ? new SolidColorBrush(Colors.LightCoral) : new SolidColorBrush(Colors.Transparent);
-                }
-            }
-        }
-
-        private void ShowTaskPopup(Calendar calendar, Popup popup, TextBlock popupTitle, TextBlock popupText, DateTime selectedDate)
-        {
-            var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
-            if (upcomingTask != null)
-            {
-                popup.IsOpen = true;
-                popupTitle.Text = upcomingTask.Title;
-                popupText.Text = $"Date sélectionnée : {selectedDate.ToShortDateString()}";
-            }
-            else
-            {
-                popup.IsOpen = false;
-            }
-        }
-
-        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T tChild)
-                    {
-                        yield return tChild;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-
-        public event EventHandler CanExecuteChanged;
+            new UpcomingTask { Title = "Event 1", EventDate = new DateTime(2024, 11, 10) },
+            new UpcomingTask { Title = "Event 2", EventDate = new DateTime(2024, 11, 12) },
+            new UpcomingTask { Title = "Event 3", EventDate = new DateTime(2024, 11, 15) },
+            new UpcomingTask { Title = "Event 4", EventDate = new DateTime(2024, 11, 20) },
+            new UpcomingTask { Title = "Event 5", EventDate = new DateTime(2024, 11, 30) }
+        };
     }
+
+    public bool CanExecute(object parameter) => true;
+
+    public void Execute(object parameter)
+    {
+        if (parameter is Calendar)
+        {
+            HighlightEventDates();
+        }
+        else if (parameter is MouseButtonEventArgs e)
+        {
+            ClickOnDate(e);
+        }
+    }
+
+    private void HighlightEventDates()
+    {
+        if (Calendar == null) return;
+
+        foreach (var calendarDayButton in FindVisualChildren<CalendarDayButton>(Calendar))
+        {
+            if (calendarDayButton.DataContext is DateTime date)
+            {
+                var isEvent = tasks.Exists(t => t.EventDate.Date == date.Date);
+                calendarDayButton.Background = isEvent ? new SolidColorBrush(Colors.LightCoral) : new SolidColorBrush(Colors.Transparent);
+            }
+        }
+    }
+
+    private void ClickOnDate(MouseButtonEventArgs e)
+    {
+        var calendarDayButton = FindParent<CalendarDayButton>(e.OriginalSource as DependencyObject);
+
+        if (calendarDayButton != null && calendarDayButton.DataContext is DateTime selectedDate)
+        {
+            ShowTaskPopup(selectedDate);
+            e.Handled = true;
+        }
+    }
+
+    private void ShowTaskPopup(DateTime selectedDate)
+    {
+        if (Popup == null || PopupTitle == null || PopupText == null) return;
+
+        var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
+        if (upcomingTask != null)
+        {
+            Popup.IsOpen = true;
+            PopupTitle.Text = upcomingTask.Title;
+            PopupText.Text = $"Date sélectionnée : {selectedDate.ToShortDateString()}";
+        }
+        else
+        {
+            Popup.IsOpen = false;
+        }
+    }
+
+    private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+    {
+        DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+        if (parentObject == null) return null;
+        if (parentObject is T parent) return parent;
+        return FindParent<T>(parentObject);
+    }
+
+    private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+    {
+        if (depObj != null)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                if (child != null && child is T tChild)
+                {
+                    yield return tChild;
+                }
+
+                foreach (T childOfChild in FindVisualChildren<T>(child))
+                {
+                    yield return childOfChild;
+                }
+            }
+        }
+    }
+
+    public event EventHandler CanExecuteChanged;
 }
