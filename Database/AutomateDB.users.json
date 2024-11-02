@@ -1,0 +1,16 @@
+[{
+  "_id": {
+    "$oid": "6724d37048794e79863473e7"
+  },
+  "Username": "michel_lesage",
+  "Password": "$2a$11$LoPIt6X.yxk0MLM8zvdpje1rpfbBs/6tYGtf5t4.EJUUYbMR3lx5K",
+  "Role": "employee"
+},
+{
+  "_id": {
+    "$oid": "6724d38f48794e79863473ea"
+  },
+  "Username": "bertrand_ladministrateur",
+  "Password": "$2a$11$UHqG0wkKHtJJeXHv/A2x8uKaiqbEm4x2VrrUY4f2N0OHLsSh3ewu6",
+  "Role": "admin"
+}]
