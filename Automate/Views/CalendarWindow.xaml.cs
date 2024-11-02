@@ -1,78 +1,115 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+using Automate.Models;
 
 namespace Automate.Views
 {
     public partial class CalendarWindow : Window
     {
-        private List<CalendarEvent> events;
+        private List<UpcomingTask> tasks;
 
         public CalendarWindow()
         {
             InitializeComponent();
-            InitializeEvents();
+            InitializeTasks();
             HighlightEventDates();
         }
 
-        private void InitializeEvents()
+        private void InitializeTasks()
         {
-            events = new List<CalendarEvent>
+            tasks = new List<UpcomingTask>
             {
-                new CalendarEvent { Title = "Event 1", Date = new DateTime(2024, 11, 10) },
-                new CalendarEvent { Title = "Event 2", Date = new DateTime(2024, 11, 12) },
-                new CalendarEvent { Title = "Event 3", Date = new DateTime(2024, 11, 15) },
-                new CalendarEvent { Title = "Event 4", Date = new DateTime(2024, 11, 20) },
-                new CalendarEvent { Title = "Event 5", Date = new DateTime(2024, 11, 30) }
+                new UpcomingTask { Title = "Event 1", EventDate = new DateTime(2024, 11, 10) },
+                new UpcomingTask { Title = "Event 2", EventDate = new DateTime(2024, 11, 12) },
+                new UpcomingTask { Title = "Event 3", EventDate = new DateTime(2024, 11, 15) },
+                new UpcomingTask { Title = "Event 4", EventDate = new DateTime(2024, 11, 20) },
+                new UpcomingTask { Title = "Event 5", EventDate = new DateTime(2024, 11, 30) }
             };
+        }
+
+        private void MyCalendar_Loaded(object sender, RoutedEventArgs e)
+        {
+            HighlightEventDates();
         }
 
         private void HighlightEventDates()
         {
-            foreach (var calendarEvent in events)
+            foreach (var calendarDayButton in FindVisualChildren<CalendarDayButton>(myCalendar))
             {
-                var date = calendarEvent.Date;
-
-                // Vérifiez si la date est dans la plage d'affichage du calendrier
-                if (date >= myCalendar.DisplayDate.AddDays(-myCalendar.DisplayDate.Day) &&
-                    date <= myCalendar.DisplayDate.AddMonths(1))
+                if (calendarDayButton.DataContext is DateTime date)
                 {
-                    // Changez la date sélectionnée pour la date d'événement
-                    if (myCalendar.SelectedDate == null)
+                    var isEvent = tasks.Exists(t => t.EventDate.Date == date.Date);
+                    if (isEvent)
                     {
-                        myCalendar.SelectedDate = date;
+                        calendarDayButton.Background = new SolidColorBrush(Colors.LightCoral);
+                    }
+                    else
+                    {
+                        calendarDayButton.Background = new SolidColorBrush(Colors.Transparent);
                     }
                 }
             }
         }
 
-        private void MyCalendar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
-            if (e.OriginalSource is CalendarDayButton calendarDayButton)
+            if (depObj != null)
             {
-                DateTime selectedDate = (DateTime)calendarDayButton.Content;
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T tChild)
+                    {
+                        yield return tChild;
+                    }
 
-                // Montrez le Popup avec le titre de l'événement si la date est un événement
-                var calendarEvent = events.Find(e => e.Date.Date == selectedDate.Date);
-                if (calendarEvent != null)
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
+        }
+
+        private void MyCalendar_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var calendarDayButton = FindParent<CalendarDayButton>(e.OriginalSource as DependencyObject);
+
+            if (calendarDayButton != null && calendarDayButton.DataContext is DateTime selectedDate)
+            {
+                var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
+                if (upcomingTask != null)
                 {
                     myPopup.IsOpen = true;
-                    myPopupTitle.Text = calendarEvent.Title;
+                    myPopupTitle.Text = upcomingTask.Title;
                     myPopupText.Text = $"Date sélectionnée : {selectedDate.ToShortDateString()}";
                 }
                 else
                 {
-                    myPopup.IsOpen = false; // Fermer le popup si aucune date d'événement
+                    myPopup.IsOpen = false; 
                 }
+
+                e.Handled = true; 
             }
         }
-    }
 
-    public class CalendarEvent
-    {
-        public string Title { get; set; }
-        public DateTime Date { get; set; }
+        private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+
+            if (parentObject == null) return null;
+
+            if (parentObject is T parent)
+            {
+                return parent;
+            }
+            else
+            {
+                return FindParent<T>(parentObject);
+            }
+        }
     }
 }
