@@ -1,20 +1,19 @@
 ﻿using Automate.Models;
 using System.Collections.Generic;
-using System.Windows.Controls.Primitives;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 using System;
+using System.Windows.Controls.Primitives;
 
 public class CalendarCommand : ICommand
 {
     private readonly List<UpcomingTask> tasks;
 
     public Calendar Calendar { get; set; }
-    public Popup Popup { get; set; }
-    public TextBlock PopupTitle { get; set; }
-    public TextBlock PopupText { get; set; }
+    public TextBlock EventTitle { get; set; }
+    public TextBlock EventDate { get; set; }
 
     public CalendarCommand()
     {
@@ -62,25 +61,23 @@ public class CalendarCommand : ICommand
 
         if (calendarDayButton != null && calendarDayButton.DataContext is DateTime selectedDate)
         {
-            ShowTaskPopup(selectedDate);
+            ShowTaskDetails(selectedDate);
             e.Handled = true;
         }
     }
 
-    private void ShowTaskPopup(DateTime selectedDate)
+    private void ShowTaskDetails(DateTime selectedDate)
     {
-        if (Popup == null || PopupTitle == null || PopupText == null) return;
-
         var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
         if (upcomingTask != null)
         {
-            Popup.IsOpen = true;
-            PopupTitle.Text = upcomingTask.Title;
-            PopupText.Text = $"Date sélectionnée : {selectedDate.ToShortDateString()}";
+            EventTitle.Text = upcomingTask.Title;
+            EventDate.Text = $"Date sélectionnée : {selectedDate.ToShortDateString()}";
         }
         else
         {
-            Popup.IsOpen = false;
+            EventTitle.Text = "Aucun événement";
+            EventDate.Text = "";
         }
     }
 
@@ -114,7 +111,6 @@ public class CalendarCommand : ICommand
 
         return results;
     }
-
 
     public event EventHandler CanExecuteChanged;
 }
