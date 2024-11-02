@@ -1,25 +1,15 @@
-﻿using System;
+﻿using Automate.Utils.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Automate.Views
 {
-    /// <summary>
-    /// Interaction logic for TaskFormWindow.xaml
-    /// </summary>
     public partial class TaskFormWindow : Window
     {
-        public string SelectedEventType { get; private set; }
+        public EventType SelectedEventType { get; private set; } // Utilisation de EventType
         public DateTime EventDate { get; private set; }
         public bool IsConfirmed { get; private set; }
 
@@ -28,13 +18,15 @@ namespace Automate.Views
             InitializeComponent();
             EventDate = selectedDate;
             eventDateTextBox.Text = EventDate.ToShortDateString();
+
+            eventTypeComboBox.ItemsSource = Enum.GetValues(typeof(EventType)).Cast<EventType>();
         }
 
         private void OnAddButtonClick(object sender, RoutedEventArgs e)
         {
-            if (eventTypeComboBox.SelectedItem is ComboBoxItem selectedItem)
+            if (eventTypeComboBox.SelectedItem is EventType selectedItem)
             {
-                SelectedEventType = selectedItem.Content.ToString();
+                SelectedEventType = selectedItem; 
                 IsConfirmed = true;
                 this.Close();
             }

@@ -11,15 +11,7 @@
             <TextBlock Text="Ajouter / Modifier Événement" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
 
             <TextBlock Text="Type d'événement"/>
-            <ComboBox x:Name="eventTypeComboBox" Width="200">
-                <ComboBoxItem Content="Semis"/>
-                <ComboBoxItem Content="Rempotage"/>
-                <ComboBoxItem Content="Entretien (désherbage/taille/fertilisation)"/>
-                <ComboBoxItem Content="Arrosage"/>
-                <ComboBoxItem Content="Récolte"/>
-                <ComboBoxItem Content="Commandes"/>
-                <ComboBoxItem Content="Événements spéciaux (visites/formations/etc.)"/>
-            </ComboBox>
+            <ComboBox x:Name="eventTypeComboBox" />
 
             <TextBlock Text="Date de l'événement" Margin="0,10,0,0"/>
             <TextBox x:Name="eventDateTextBox" IsReadOnly="True" Width="200" />

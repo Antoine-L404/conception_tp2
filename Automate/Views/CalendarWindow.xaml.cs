@@ -66,6 +66,9 @@ namespace Automate.Views
             }
         }
 
+
+
+
         private void OnEditEventClick(object sender, RoutedEventArgs e)
         {
             if (selectedDate.HasValue)

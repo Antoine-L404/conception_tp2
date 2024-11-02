@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using Automate.Utils.Constants;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 
@@ -9,21 +10,8 @@ namespace Automate.Models
         [BsonId]
         public ObjectId Id { get; set; }
 
-        private string _title = "";
         [BsonElement("Title")]
-        public string Title
-        {
-            get => _title;
-            set
-            {
-                ArgumentNullException.ThrowIfNull(value);
-                if (value.Trim().Length == 0)
-                {
-                    throw new ArgumentException();
-                }
-                _title = value;
-            }
-        }
+        public EventType Title { get; set; }
 
         private DateTime _eventDate;
         [BsonElement("DateEvenement")]

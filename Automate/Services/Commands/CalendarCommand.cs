@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows;
 using System;
 using System.Windows.Controls.Primitives;
+using Automate.Utils.Constants;
 
 public class CalendarCommand : ICommand
 {
@@ -19,11 +20,11 @@ public class CalendarCommand : ICommand
     {
         tasks = new List<UpcomingTask>
         {
-            new UpcomingTask { Title = "Event 1", EventDate = new DateTime(2024, 11, 10) },
-            new UpcomingTask { Title = "Event 2", EventDate = new DateTime(2024, 11, 12) },
-            new UpcomingTask { Title = "Event 3", EventDate = new DateTime(2024, 11, 15) },
-            new UpcomingTask { Title = "Event 4", EventDate = new DateTime(2024, 11, 20) },
-            new UpcomingTask { Title = "Event 5", EventDate = new DateTime(2024, 11, 30) }
+            new UpcomingTask { Title = EventType.Semis, EventDate = new DateTime(2024, 11, 10) },
+            new UpcomingTask { Title = EventType.Rempotage, EventDate = new DateTime(2024, 11, 12) },
+            new UpcomingTask { Title = EventType.Entretien, EventDate = new DateTime(2024, 11, 15) },
+            new UpcomingTask { Title = EventType.Arrosage, EventDate = new DateTime(2024, 11, 20) },
+            new UpcomingTask { Title = EventType.Recolte, EventDate = new DateTime(2024, 11, 30) }
         };
     }
 
@@ -79,7 +80,7 @@ public class CalendarCommand : ICommand
         var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
         if (upcomingTask != null)
         {
-            EventTitle.Text = upcomingTask.Title;
+            EventTitle.Text = upcomingTask.Title.ToString();
             EventDate.Text = $"Date sélectionnée : {selectedDate.ToShortDateString()}";
         }
         else
