@@ -7,6 +7,7 @@ using System.Windows;
 using System;
 using System.Windows.Controls.Primitives;
 using Automate.Utils.Constants;
+using System.Linq;
 
 public class CalendarCommand : ICommand
 {
@@ -121,6 +122,12 @@ public class CalendarCommand : ICommand
 
         return results;
     }
+
+    public UpcomingTask GetEventForDate(DateTime date)
+    {
+        return tasks.FirstOrDefault(task => task.EventDate.Date == date.Date);
+    }
+
 
     public event EventHandler CanExecuteChanged;
 }

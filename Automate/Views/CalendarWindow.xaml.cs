@@ -73,15 +73,25 @@ namespace Automate.Views
         {
             if (selectedDate.HasValue)
             {
-                TaskFormWindow eventForm = new TaskFormWindow(selectedDate.Value);
-                eventForm.ShowDialog();
-
-                if (eventForm.IsConfirmed)
+                var existingTask = _calendarCommand.GetEventForDate(selectedDate.Value);
+                if (existingTask != null)
                 {
-                    MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
+                    TaskFormWindow eventForm = new TaskFormWindow(selectedDate.Value, existingTask.Title);
+                    eventForm.ShowDialog();
 
-                    _calendarCommand.Execute(myCalendar); 
-                    _calendarCommand.ShowTaskDetails(eventForm.EventDate);
+                    if (eventForm.IsConfirmed)
+                    {
+                        existingTask.Title = eventForm.SelectedEventType;
+                        existingTask.EventDate = eventForm.EventDate;
+                        MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
+
+                        _calendarCommand.Execute(myCalendar);
+                        _calendarCommand.ShowTaskDetails(eventForm.EventDate);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Aucun événement à modifier pour cette date.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             else
@@ -89,6 +99,7 @@ namespace Automate.Views
                 MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
 
     }
 }
