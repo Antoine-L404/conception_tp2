@@ -100,6 +100,24 @@ namespace Automate.Views
             }
         }
 
+        private void OnDeleteEventClick(object sender, RoutedEventArgs e)
+        {
+            if (selectedDate.HasValue)
+            {
+                var result = MessageBox.Show($"Voulez-vous vraiment supprimer l'événement du {selectedDate.Value.ToShortDateString()} ?", "Confirmation de suppression", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    _calendarCommand.DeleteEvent(selectedDate.Value); // Supprime l'événement pour la date sélectionnée
+                    MessageBox.Show("Événement supprimé avec succès.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+
 
     }
 }

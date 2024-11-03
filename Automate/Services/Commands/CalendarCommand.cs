@@ -50,6 +50,24 @@ public class CalendarCommand : ICommand
         ShowTaskDetails(newTask.EventDate); 
     }
 
+    public void DeleteEvent(DateTime date)
+    {
+        var taskToDelete = tasks.FirstOrDefault(t => t.EventDate.Date == date.Date);
+
+        if (taskToDelete != null)
+        {
+            tasks.Remove(taskToDelete); 
+            HighlightEventDates(); 
+            ClearTaskDetails(); 
+        }
+    }
+
+
+    private void ClearTaskDetails()
+    {
+        EventTitle.Text = "Aucun événement";
+        EventDate.Text = "";
+    }
 
     private void HighlightEventDates()
     {
