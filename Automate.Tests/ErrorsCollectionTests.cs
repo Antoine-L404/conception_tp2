@@ -156,7 +156,7 @@ namespace Automate.Tests
         }
 
         [TestMethod]
-        public void GetAllErrorMessages_NoErrorMessage_ReturnEmptyString()
+        public void GetAllErrorMessages_ContainsNoErrorMessage_ReturnEmptyString()
         {
             errorsCollection = new ErrorsCollection(ErrorsChanged);
 
@@ -190,7 +190,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetAllErrorMessages_ContainsManyErrorMessages_ReturnErrorMessagesWithCorrectFormat()
         {
-            const string PROPERTY_NAME = "Unique11";
+            const string PROPERTY_NAME = "Unique12";
             string expectedResult = string.Join("\n", ERROR_MESSAGE_1, ERROR_MESSAGE_2);
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_2);
@@ -198,6 +198,39 @@ namespace Automate.Tests
             string result = errorsCollection.GetAllErrorMessages();
 
             Assert.AreEqual(expectedResult, result);
+        }
+
+        [TestMethod]
+        public void ContainsAnyError_ContainsNoError_ReturnFalse()
+        {
+            errorsCollection = new ErrorsCollection(ErrorsChanged);
+
+            bool result = errorsCollection.ContainsAnyError();
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void ContainsAnyError_ContainsOneError_ReturnTrue()
+        {
+            const string PROPERTY_NAME = "Unique13";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            bool result = errorsCollection.ContainsAnyError();
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void ContainsAnyError_ContainsManyErrors_ReturnTrue()
+        {
+            const string PROPERTY_NAME = "Unique14";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_2);
+
+            bool result = errorsCollection.ContainsAnyError();
+
+            Assert.IsTrue(result);
         }
     }
 }
