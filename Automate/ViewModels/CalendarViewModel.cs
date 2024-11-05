@@ -30,9 +30,9 @@ namespace Automate.ViewModels
         }
 
 
-        private void AddEvent(object parameter)
+        private void AddEvent()
         {
-            if (parameter is DateTime selectedDate)
+            if (selectedDate is not null)
             {
                 CalendarCommand.Execute(selectedDate);
             }
