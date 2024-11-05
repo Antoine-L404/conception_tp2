@@ -11,6 +11,7 @@ namespace Automate.Tests
         
         private readonly string ERROR_MESSAGE_1 = "unique error message1";
         private readonly string ERROR_MESSAGE_2 = "unique error message2";
+        private readonly string EMPTY_ERROR_MESSAGE = string.Empty;
 
         public ErrorsCollectionTests()
         {
@@ -95,7 +96,8 @@ namespace Automate.Tests
 
             errorsCollection.RemoveError(PROPERTY_NAME);
 
-            Assert.AreEqual(Enumerable.Empty<string>(), errorsCollection.GetErrors(PROPERTY_NAME));
+            var result = errorsCollection.GetErrors(PROPERTY_NAME);
+            Assert.AreEqual(Enumerable.Empty<string>(), result);
         }
 
         [TestMethod]
@@ -106,7 +108,96 @@ namespace Automate.Tests
 
             errorsCollection.RemoveError(PROPERTY_NAME);
 
-            Assert.AreEqual(Enumerable.Empty<string>(), errorsCollection.GetErrors(PROPERTY_NAME));
+            var result = errorsCollection.GetErrors(PROPERTY_NAME);
+            Assert.AreEqual(Enumerable.Empty<string>(), result);
+        }
+
+        [TestMethod]
+        public void GetErrors_InexistantKey_ReturnEmptyEnumerable()
+        {
+            const string PROPERTY_NAME = "Unique8";
+
+            var result = errorsCollection.GetErrors(PROPERTY_NAME);
+            Assert.AreEqual(Enumerable.Empty<string>(), result);
+        }
+
+        [TestMethod]
+        public void GetErrors_ExistantKey_ReturnValueIsNotEmpty()
+        {
+            const string PROPERTY_NAME = "Unique9";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            var result = errorsCollection.GetErrors(PROPERTY_NAME);
+
+            Assert.AreNotEqual(Enumerable.Empty<string>(), result);
+        }
+
+        [TestMethod]
+        public void GetErrors_ExistantKey_ReturnValueIsCorrect()
+        {
+            const string PROPERTY_NAME = "Unique9";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            List<string>? result = errorsCollection.GetErrors(PROPERTY_NAME) as List<string>;
+
+            Assert.AreEqual(ERROR_MESSAGE_1, result![0]);
+        }
+
+        [TestMethod]
+        public void GetErrors_ExistantKey_ReturnValueCountIsCorrect()
+        {
+            const string PROPERTY_NAME = "Unique9";
+            const int EXPECTED_COUNT = 1;
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            List<string>? result = errorsCollection.GetErrors(PROPERTY_NAME) as List<string>;
+
+            Assert.AreEqual(EXPECTED_COUNT, result!.Count);
+        }
+
+        [TestMethod]
+        public void GetAllErrorMessages_NoErrorMessage_ReturnEmptyString()
+        {
+            errorsCollection = new ErrorsCollection(ErrorsChanged);
+
+            string result = errorsCollection.GetAllErrorMessages();
+
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        public void GetAllErrorMessages_ContainsErrorMessages_ReturnNotEmptyString()
+        {
+            const string PROPERTY_NAME = "Unique10";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            string result = errorsCollection.GetAllErrorMessages();
+
+            Assert.AreNotEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        public void GetAllErrorMessages_ContainsOneErrorMessage_ReturnErrorMessage()
+        {
+            const string PROPERTY_NAME = "Unique11";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            string result = errorsCollection.GetAllErrorMessages();
+
+            Assert.AreEqual(ERROR_MESSAGE_1, result);
+        }
+
+        [TestMethod]
+        public void GetAllErrorMessages_ContainsManyErrorMessages_ReturnErrorMessagesWithCorrectFormat()
+        {
+            const string PROPERTY_NAME = "Unique11";
+            string expectedResult = string.Join("\n", ERROR_MESSAGE_1, ERROR_MESSAGE_2);
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_2);
+
+            string result = errorsCollection.GetAllErrorMessages();
+
+            Assert.AreEqual(expectedResult, result);
         }
     }
 }
