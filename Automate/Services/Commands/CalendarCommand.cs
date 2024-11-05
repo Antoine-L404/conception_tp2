@@ -8,6 +8,7 @@ using System;
 using System.Windows.Controls.Primitives;
 using Automate.Utils.Constants;
 using System.Linq;
+using Automate.Views;
 
 public class CalendarCommand : ICommand
 {
@@ -40,6 +41,33 @@ public class CalendarCommand : ICommand
         else if (parameter is MouseButtonEventArgs e)
         {
             ClickOnDate(e);
+        }
+        else if (parameter is DateTime selectedDate)
+        {
+            OpenEventForm(selectedDate);
+        }
+    }
+
+    private void OpenEventForm(DateTime selectedDate)
+    {
+        TaskFormWindow eventForm = new TaskFormWindow(selectedDate);
+        eventForm.ShowDialog();
+
+        if (eventForm.IsConfirmed)
+        {
+            var newTask = new UpcomingTask
+            {
+                Title = eventForm.SelectedEventType,
+                EventDate = eventForm.EventDate
+            };
+
+            AddEvent(newTask);
+
+            MessageBox.Show($"Événement '{eventForm.SelectedEventType}' ajouté pour le {eventForm.EventDate.ToShortDateString()}");
+        }
+        else
+        {
+            MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 

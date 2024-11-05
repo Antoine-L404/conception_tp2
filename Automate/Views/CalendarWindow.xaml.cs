@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Automate.Models;
+using Automate.ViewModels;
 
 namespace Automate.Views
 {
@@ -13,6 +14,7 @@ namespace Automate.Views
         public CalendarWindow()
         {
             InitializeComponent();
+            DataContext = new CalendarViewModel();
             _calendarCommand = new CalendarCommand
             {
                 Calendar = myCalendar,
@@ -35,34 +37,6 @@ namespace Automate.Views
             {
                 selectedDate = myCalendar.SelectedDate.Value;
                 _calendarCommand.ShowTaskDetails(selectedDate.Value); 
-            }
-        }
-
-        private void OnAddEventClick(object sender, RoutedEventArgs e)
-        {
-            if (selectedDate.HasValue)
-            {
-                TaskFormWindow eventForm = new TaskFormWindow(selectedDate.Value);
-                eventForm.ShowDialog();
-
-                if (eventForm.IsConfirmed)
-                {
-                    var newTask = new UpcomingTask
-                    {
-                        Title = eventForm.SelectedEventType,
-                        EventDate = eventForm.EventDate
-                    };
-
-                    _calendarCommand.AddEvent(newTask);
-                    _calendarCommand.Execute(myCalendar); 
-                    MessageBox.Show($"Événement '{eventForm.SelectedEventType}' ajouté pour le {eventForm.EventDate.ToShortDateString()}");
-
-                    _calendarCommand.ShowTaskDetails(eventForm.EventDate);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
