@@ -1,8 +1,10 @@
 ﻿using Automate.Models;
 using Automate.Services.Commands;
+using Automate.Utils.Constants;
 using Automate.Views;
 using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Automate.ViewModels
@@ -11,6 +13,9 @@ namespace Automate.ViewModels
     {
         public CalendarCommand CalendarCommand { get; }
         public ICommand OnAddEventClick { get; }
+        public ICommand OnEditEventClick { get; }
+        public ICommand OnDeleteEventClick { get; }
+
 
         private DateTime? selectedDate;
         public DateTime? SelectedDate
@@ -26,11 +31,14 @@ namespace Automate.ViewModels
         {
             CalendarCommand = new CalendarCommand();
 
-            OnAddEventClick = new RelayCommand(AddEvent);
+            OnAddEventClick = new RelayCommand(VerifyDate);
+            OnEditEventClick = new RelayCommand(VerifyDate);
+            OnDeleteEventClick = new RelayCommand(VerifyDate);
+
         }
 
 
-        private void AddEvent()
+        private void VerifyDate()
         {
             if (selectedDate is not null)
             {

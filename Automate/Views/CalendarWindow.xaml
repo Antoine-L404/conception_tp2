@@ -18,8 +18,8 @@
                 <TextBlock x:Name="eventDate" FontSize="12" Foreground="Gray" />
                 <StackPanel Margin="20">
                     <Button Content="Ajouter un événement" Command="{Binding OnAddEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0"/>
-                    <Button Content="Modifier l'événement" Click="OnEditEventClick" Margin="0,10,0,0"/>
-                    <Button Content="Supprimer l'événement" Click="OnDeleteEventClick" Margin="0,10,0,0"/>
+                    <Button Content="Modifier l'événement" Command="{Binding OnEditEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0"/>
+                    <Button Content="Supprimer l'événement" Command="{Binding OnDeleteEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

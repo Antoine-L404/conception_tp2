@@ -20,6 +20,27 @@ public class CalendarCommand : ICommand
 
     public CalendarCommand()
     {
+        EventTitle = new TextBlock { Text = "Aucun événement" };
+        EventDate = new TextBlock { Text = "" };
+
+        tasks = new List<UpcomingTask>
+        {
+            new UpcomingTask { Title = EventType.Semis, EventDate = new DateTime(2024, 11, 10) },
+            new UpcomingTask { Title = EventType.Rempotage, EventDate = new DateTime(2024, 11, 12) },
+            new UpcomingTask { Title = EventType.Entretien, EventDate = new DateTime(2024, 11, 15) },
+            new UpcomingTask { Title = EventType.Arrosage, EventDate = new DateTime(2024, 11, 20) },
+            new UpcomingTask { Title = EventType.Recolte, EventDate = new DateTime(2024, 11, 30) }
+        };
+
+
+    }
+
+    public CalendarCommand(Calendar calendar, TextBlock eventTitle, TextBlock eventDate)
+    {
+        Calendar = calendar;
+        EventTitle = eventTitle;
+        EventDate = eventDate;
+
         tasks = new List<UpcomingTask>
         {
             new UpcomingTask { Title = EventType.Semis, EventDate = new DateTime(2024, 11, 10) },
@@ -71,11 +92,13 @@ public class CalendarCommand : ICommand
         }
     }
 
+
     public void AddEvent(UpcomingTask newTask)
     {
         tasks.Add(newTask);
-        HighlightEventDates(); 
-        ShowTaskDetails(newTask.EventDate); 
+        HighlightEventDates();
+        CalendarCommand _calendarCommand = new CalendarCommand();
+        ShowTaskDetails(newTask.EventDate);
     }
 
     public void DeleteEvent(DateTime date)
@@ -84,9 +107,9 @@ public class CalendarCommand : ICommand
 
         if (taskToDelete != null)
         {
-            tasks.Remove(taskToDelete); 
-            HighlightEventDates(); 
-            ClearTaskDetails(); 
+            tasks.Remove(taskToDelete);
+            HighlightEventDates();
+            ClearTaskDetails();
         }
     }
 
