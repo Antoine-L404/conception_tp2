@@ -2,7 +2,7 @@
 using Automate.Utils.Validation;
 using Moq;
 
-namespace Automate.Tests
+namespace Automate.Tests.Utils.Validation
 {
     [TestClass]
     public class CommonValidationTests
@@ -18,7 +18,7 @@ namespace Automate.Tests
         private readonly string ERROR_MESSAGE = "errorMessage";
 
 
-        public CommonValidationTests() 
+        public CommonValidationTests()
         {
             emptyAction = () => { actionResult = ACTION_VALUE; };
             errorCollectionMock = new Mock<IErrorsCollection>();

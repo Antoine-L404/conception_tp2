@@ -2,7 +2,7 @@
 using Moq;
 using System.ComponentModel;
 
-namespace Automate.Tests
+namespace Automate.Tests.Utils.Validation
 {
     [TestClass]
     public class ErrorsCollectionTests
