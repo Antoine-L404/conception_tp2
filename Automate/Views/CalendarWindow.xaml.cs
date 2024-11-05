@@ -41,39 +41,5 @@ namespace Automate.Views
         }
 
 
-
-
-        private void OnEditEventClick(object sender, RoutedEventArgs e)
-        {
-            if (selectedDate.HasValue)
-            {
-                var existingTask = _calendarCommand.GetEventForDate(selectedDate.Value);
-                if (existingTask != null)
-                {
-                    TaskFormWindow eventForm = new TaskFormWindow(selectedDate.Value, existingTask.Title);
-                    eventForm.ShowDialog();
-
-                    if (eventForm.IsConfirmed)
-                    {
-                        existingTask.Title = eventForm.SelectedEventType;
-                        existingTask.EventDate = eventForm.EventDate;
-                        MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
-
-                        _calendarCommand.Execute(myCalendar);
-                        _calendarCommand.ShowTaskDetails(eventForm.EventDate);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Aucun événement à modifier pour cette date.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-
     }
 }
