@@ -31,18 +31,42 @@ namespace Automate.ViewModels
         {
             CalendarCommand = new CalendarCommand();
 
-            OnAddEventClick = new RelayCommand(VerifyDate);
-            OnEditEventClick = new RelayCommand(VerifyDate);
-            OnDeleteEventClick = new RelayCommand(VerifyDate);
+            OnAddEventClick = new RelayCommand(AddEvent);
+            OnEditEventClick = new RelayCommand(EditEvent);
+            OnDeleteEventClick = new RelayCommand(DeleteEvent);
 
         }
 
 
-        private void VerifyDate()
+        private void AddEvent()
         {
             if (selectedDate is not null)
             {
-                CalendarCommand.Execute(selectedDate);
+                CalendarCommand.Execute(new CalendarAction(CalendarActionType.Add, selectedDate.Value));
+            }
+            else
+            {
+                MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void EditEvent()
+        {
+            if (selectedDate is not null)
+            {
+                CalendarCommand.Execute(new CalendarAction(CalendarActionType.Edit, selectedDate.Value));
+            }
+            else
+            {
+                MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void DeleteEvent()
+        {
+            if (selectedDate is not null)
+            {
+                CalendarCommand.Execute(new CalendarAction(CalendarActionType.Delete, selectedDate.Value));
             }
             else
             {

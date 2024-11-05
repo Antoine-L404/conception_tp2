@@ -35,22 +35,6 @@ public class CalendarCommand : ICommand
 
     }
 
-    public CalendarCommand(Calendar calendar, TextBlock eventTitle, TextBlock eventDate)
-    {
-        Calendar = calendar;
-        EventTitle = eventTitle;
-        EventDate = eventDate;
-
-        tasks = new List<UpcomingTask>
-        {
-            new UpcomingTask { Title = EventType.Semis, EventDate = new DateTime(2024, 11, 10) },
-            new UpcomingTask { Title = EventType.Rempotage, EventDate = new DateTime(2024, 11, 12) },
-            new UpcomingTask { Title = EventType.Entretien, EventDate = new DateTime(2024, 11, 15) },
-            new UpcomingTask { Title = EventType.Arrosage, EventDate = new DateTime(2024, 11, 20) },
-            new UpcomingTask { Title = EventType.Recolte, EventDate = new DateTime(2024, 11, 30) }
-        };
-    }
-
     public bool CanExecute(object parameter) => true;
 
     public void Execute(object parameter)
@@ -63,15 +47,24 @@ public class CalendarCommand : ICommand
         {
             ClickOnDate(e);
         }
-        else if (parameter is DateTime selectedDate)
+        else if (parameter is CalendarAction action)
         {
-            OpenEventForm(selectedDate);
+            switch (action.ActionType)
+            {
+                case CalendarActionType.Delete:
+                    DeleteEvent(action.Date);
+                    break;
+                default:
+                    OpenEventForm(action);
+                    break;
+            }
+            
         }
     }
 
-    private void OpenEventForm(DateTime selectedDate)
+    private void OpenEventForm(CalendarAction action)
     {
-        TaskFormWindow eventForm = new TaskFormWindow(selectedDate);
+        TaskFormWindow eventForm = new TaskFormWindow(action.Date);
         eventForm.ShowDialog();
 
         if (eventForm.IsConfirmed)
@@ -82,7 +75,15 @@ public class CalendarCommand : ICommand
                 EventDate = eventForm.EventDate
             };
 
-            AddEvent(newTask);
+            switch (action.ActionType)
+            {
+                case CalendarActionType.Add:
+                    AddEvent(newTask);
+                    break;
+                case CalendarActionType.Edit:
+                    EditEvent(newTask);
+                    break;
+            }
 
             MessageBox.Show($"Événement '{eventForm.SelectedEventType}' ajouté pour le {eventForm.EventDate.ToShortDateString()}");
         }
@@ -101,17 +102,61 @@ public class CalendarCommand : ICommand
         ShowTaskDetails(newTask.EventDate);
     }
 
+    public void EditEvent(UpcomingTask newTask)
+    {
+        // TODO Convertir ceci pour fonctionnel en commande
+        //var existingTask = _calendarCommand.GetEventForDate(selectedDate.Value);
+        //if (existingTask != null)
+        //{
+        //    TaskFormWindow eventForm = new TaskFormWindow(selectedDate.Value, existingTask.Title);
+        //    eventForm.ShowDialog();
+
+        //    if (eventForm.IsConfirmed)
+        //    {
+        //        existingTask.Title = eventForm.SelectedEventType;
+        //        existingTask.EventDate = eventForm.EventDate;
+        //        MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
+
+        //        _calendarCommand.Execute(myCalendar);
+        //        _calendarCommand.ShowTaskDetails(eventForm.EventDate);
+        //    }
+        //}
+        //else
+        //{
+        //    MessageBox.Show("Aucun événement à modifier pour cette date.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+        //}
+        tasks.Add(newTask);
+        HighlightEventDates();
+        CalendarCommand _calendarCommand = new CalendarCommand();
+        ShowTaskDetails(newTask.EventDate);
+    }
+
     public void DeleteEvent(DateTime date)
     {
-        var taskToDelete = tasks.FirstOrDefault(t => t.EventDate.Date == date.Date);
+        var result = MessageBox.Show($"Voulez-vous vraiment supprimer l'événement du {date.ToShortDateString()} ?",
+                                     "Confirmation de suppression",
+                                     MessageBoxButton.YesNo,
+                                     MessageBoxImage.Warning);
 
-        if (taskToDelete != null)
+        if (result == MessageBoxResult.Yes)
         {
-            tasks.Remove(taskToDelete);
-            HighlightEventDates();
-            ClearTaskDetails();
+            var taskToDelete = tasks.FirstOrDefault(t => t.EventDate.Date == date.Date);
+
+            if (taskToDelete != null)
+            {
+                tasks.Remove(taskToDelete);
+                HighlightEventDates();
+                ClearTaskDetails();
+
+                MessageBox.Show("Événement supprimé avec succès.");
+            }
+            else
+            {
+                MessageBox.Show("Aucun événement trouvé à cette date.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
     }
+
 
 
     private void ClearTaskDetails()
