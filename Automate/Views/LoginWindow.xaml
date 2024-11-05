@@ -22,10 +22,12 @@
                    Height="200" 
                    Margin="5" 
                    HorizontalAlignment="Center"/>
+            <Label Target="{Binding ElementName=UsernameTextBox}" HorizontalAlignment="Center">Nom d'utilisateur</Label>
             <TextBox x:Name="UsernameTextBox"
                      Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" 
                      Width="200" Height="30" 
                      Margin="10"/>
+            <Label Target="{Binding ElementName=PasswordBox}" HorizontalAlignment="Center" Margin="0,0,0,6">Mot de passe</Label>
             <Border BorderThickness="2.5"
                     CornerRadius="2"
                     BorderBrush="{Binding HasPasswordErrors, Converter={StaticResource BoolToColorConverter}}"

@@ -4,7 +4,7 @@ namespace Automate.Utils.Validation
 {
     public static class CommonValidation
     {
-        public static void validateNullOrEmpty(string propertyName, string? property, string errorMessage,
+        public static void ValidateNullOrEmpty(string propertyName, string? property, string errorMessage,
             ErrorsCollection errorsCollection, Action notifyErrorsAction)
         {
             if (string.IsNullOrEmpty(property))
