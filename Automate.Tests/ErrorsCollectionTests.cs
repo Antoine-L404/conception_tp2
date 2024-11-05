@@ -8,7 +8,7 @@ namespace Automate.Tests
     {
         private ErrorsCollection errorsCollection;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-
+        
         private readonly string ERROR_MESSAGE_1 = "unique error message1";
         private readonly string ERROR_MESSAGE_2 = "unique error message2";
 
@@ -86,6 +86,27 @@ namespace Automate.Tests
 
             List<string>? result = errorsCollection.GetErrors(PROPERTY_NAME) as List<string>;
             Assert.AreEqual(EXPECTED_COUNT, result!.Count);
+        }
+
+        [TestMethod]
+        public void RemoveError_InexistantKey_DoesNothing()
+        {
+            const string PROPERTY_NAME = "Unique6";
+
+            errorsCollection.RemoveError(PROPERTY_NAME);
+
+            Assert.AreEqual(Enumerable.Empty<string>(), errorsCollection.GetErrors(PROPERTY_NAME));
+        }
+
+        [TestMethod]
+        public void RemoveError_ExistantKey_RemoveTheKey()
+        {
+            const string PROPERTY_NAME = "Unique7";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            errorsCollection.RemoveError(PROPERTY_NAME);
+
+            Assert.AreEqual(Enumerable.Empty<string>(), errorsCollection.GetErrors(PROPERTY_NAME));
         }
     }
 }
