@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Automate.Abstract.Utils;
+using System;
 
 namespace Automate.Utils.Validation
 {
     public static class CommonValidation
     {
         public static void ValidateNullOrEmpty(string propertyName, string? property, string errorMessage,
-            ErrorsCollection errorsCollection, Action notifyErrorsAction)
+            IErrorsCollection errorsCollection, Action notifyErrorsAction)
         {
             if (string.IsNullOrEmpty(property))
             {

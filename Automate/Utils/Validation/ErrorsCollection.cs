@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Automate.Abstract.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +7,7 @@ using System.Linq;
 
 namespace Automate.Utils.Validation
 {
-    public class ErrorsCollection
+    public class ErrorsCollection : IErrorsCollection
     {
         private Dictionary<string, List<string>> errors;
         private EventHandler<DataErrorsChangedEventArgs>? errorsChangedEvent;

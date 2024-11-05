@@ -1,4 +1,5 @@
 ﻿using Automate.Utils.Validation;
+using Moq;
 using System.ComponentModel;
 
 namespace Automate.Tests
@@ -7,15 +8,15 @@ namespace Automate.Tests
     public class ErrorsCollectionTests
     {
         private ErrorsCollection errorsCollection;
-        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
-        
+        Mock<EventHandler<DataErrorsChangedEventArgs>> errorsChangedMock;
+
         private readonly string ERROR_MESSAGE_1 = "unique error message1";
         private readonly string ERROR_MESSAGE_2 = "unique error message2";
-        private readonly string EMPTY_ERROR_MESSAGE = string.Empty;
 
         public ErrorsCollectionTests()
         {
-            errorsCollection = new ErrorsCollection(ErrorsChanged);
+            errorsChangedMock = new Mock<EventHandler<DataErrorsChangedEventArgs>>();
+            errorsCollection = new ErrorsCollection(errorsChangedMock.Object);
         }
 
         [TestMethod]
@@ -87,12 +88,25 @@ namespace Automate.Tests
 
             List<string>? result = errorsCollection.GetErrors(PROPERTY_NAME) as List<string>;
             Assert.AreEqual(EXPECTED_COUNT, result!.Count);
+
+        }
+
+        [TestMethod]
+        public void AddError_AddExistantKey_ErrorChangedEventIsInvoked()
+        {
+            const string PROPERTY_NAME = "Unique6";
+
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_2);
+
+            errorsChangedMock.Verify(
+                x => x.Invoke(It.IsAny<object>(), It.IsAny<DataErrorsChangedEventArgs>()), Times.AtLeastOnce());
         }
 
         [TestMethod]
         public void RemoveError_InexistantKey_DoesNothing()
         {
-            const string PROPERTY_NAME = "Unique6";
+            const string PROPERTY_NAME = "Unique7";
 
             errorsCollection.RemoveError(PROPERTY_NAME);
 
@@ -103,7 +117,7 @@ namespace Automate.Tests
         [TestMethod]
         public void RemoveError_ExistantKey_RemoveTheKey()
         {
-            const string PROPERTY_NAME = "Unique7";
+            const string PROPERTY_NAME = "Unique8";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
             errorsCollection.RemoveError(PROPERTY_NAME);
@@ -113,9 +127,21 @@ namespace Automate.Tests
         }
 
         [TestMethod]
+        public void RemoveError_ExistantKey_ErrorChangedEventIsInvoked()
+        {
+            const string PROPERTY_NAME = "Unique9";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            errorsCollection.RemoveError(PROPERTY_NAME);
+
+            errorsChangedMock.Verify(
+                x => x.Invoke(It.IsAny<object>(), It.IsAny<DataErrorsChangedEventArgs>()), Times.AtLeastOnce());
+        }
+
+        [TestMethod]
         public void GetErrors_InexistantKey_ReturnEmptyEnumerable()
         {
-            const string PROPERTY_NAME = "Unique8";
+            const string PROPERTY_NAME = "Unique10";
 
             var result = errorsCollection.GetErrors(PROPERTY_NAME);
             Assert.AreEqual(Enumerable.Empty<string>(), result);
@@ -124,7 +150,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetErrors_ExistantKey_ReturnValueIsNotEmpty()
         {
-            const string PROPERTY_NAME = "Unique9";
+            const string PROPERTY_NAME = "Unique11";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
             var result = errorsCollection.GetErrors(PROPERTY_NAME);
@@ -135,7 +161,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetErrors_ExistantKey_ReturnValueIsCorrect()
         {
-            const string PROPERTY_NAME = "Unique9";
+            const string PROPERTY_NAME = "Unique12";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
             List<string>? result = errorsCollection.GetErrors(PROPERTY_NAME) as List<string>;
@@ -146,7 +172,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetErrors_ExistantKey_ReturnValueCountIsCorrect()
         {
-            const string PROPERTY_NAME = "Unique9";
+            const string PROPERTY_NAME = "Unique13";
             const int EXPECTED_COUNT = 1;
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
@@ -158,7 +184,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetAllErrorMessages_ContainsNoErrorMessage_ReturnEmptyString()
         {
-            errorsCollection = new ErrorsCollection(ErrorsChanged);
+            errorsCollection = new ErrorsCollection(errorsChangedMock.Object);
 
             string result = errorsCollection.GetAllErrorMessages();
 
@@ -168,7 +194,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetAllErrorMessages_ContainsErrorMessages_ReturnNotEmptyString()
         {
-            const string PROPERTY_NAME = "Unique10";
+            const string PROPERTY_NAME = "Unique14";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
             string result = errorsCollection.GetAllErrorMessages();
@@ -179,7 +205,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetAllErrorMessages_ContainsOneErrorMessage_ReturnErrorMessage()
         {
-            const string PROPERTY_NAME = "Unique11";
+            const string PROPERTY_NAME = "Unique15";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
             string result = errorsCollection.GetAllErrorMessages();
@@ -190,7 +216,7 @@ namespace Automate.Tests
         [TestMethod]
         public void GetAllErrorMessages_ContainsManyErrorMessages_ReturnErrorMessagesWithCorrectFormat()
         {
-            const string PROPERTY_NAME = "Unique12";
+            const string PROPERTY_NAME = "Unique16";
             string expectedResult = string.Join("\n", ERROR_MESSAGE_1, ERROR_MESSAGE_2);
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_2);
@@ -203,7 +229,7 @@ namespace Automate.Tests
         [TestMethod]
         public void ContainsAnyError_ContainsNoError_ReturnFalse()
         {
-            errorsCollection = new ErrorsCollection(ErrorsChanged);
+            errorsCollection = new ErrorsCollection(errorsChangedMock.Object);
 
             bool result = errorsCollection.ContainsAnyError();
 
@@ -213,7 +239,7 @@ namespace Automate.Tests
         [TestMethod]
         public void ContainsAnyError_ContainsOneError_ReturnTrue()
         {
-            const string PROPERTY_NAME = "Unique13";
+            const string PROPERTY_NAME = "Unique17";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
             bool result = errorsCollection.ContainsAnyError();
@@ -224,7 +250,7 @@ namespace Automate.Tests
         [TestMethod]
         public void ContainsAnyError_ContainsManyErrors_ReturnTrue()
         {
-            const string PROPERTY_NAME = "Unique14";
+            const string PROPERTY_NAME = "Unique18";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_2);
 
@@ -236,7 +262,7 @@ namespace Automate.Tests
         [TestMethod]
         public void ContainsError_InexistantKey_ReturnFalse()
         {
-            const string PROPERTY_NAME = "Unique15";
+            const string PROPERTY_NAME = "Unique19";
 
             bool result = errorsCollection.ContainsError(PROPERTY_NAME);
 
@@ -246,7 +272,7 @@ namespace Automate.Tests
         [TestMethod]
         public void ContainsError_ExistantKey_ReturnTrue()
         {
-            const string PROPERTY_NAME = "Unique16";
+            const string PROPERTY_NAME = "Unique20";
             errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
 
             bool result = errorsCollection.ContainsError(PROPERTY_NAME);
