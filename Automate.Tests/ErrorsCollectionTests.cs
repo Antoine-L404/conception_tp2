@@ -232,5 +232,26 @@ namespace Automate.Tests
 
             Assert.IsTrue(result);
         }
+
+        [TestMethod]
+        public void ContainsError_InexistantKey_ReturnFalse()
+        {
+            const string PROPERTY_NAME = "Unique15";
+
+            bool result = errorsCollection.ContainsError(PROPERTY_NAME);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void ContainsError_ExistantKey_ReturnTrue()
+        {
+            const string PROPERTY_NAME = "Unique16";
+            errorsCollection.AddError(PROPERTY_NAME, ERROR_MESSAGE_1);
+
+            bool result = errorsCollection.ContainsError(PROPERTY_NAME);
+
+            Assert.IsTrue(result);
+        }
     }
 }
