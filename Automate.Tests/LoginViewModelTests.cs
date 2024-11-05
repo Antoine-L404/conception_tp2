@@ -1,7 +1,7 @@
 namespace Automate.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class LoginViewModelTests
     {
         [TestMethod]
         public void TestMethod1()
