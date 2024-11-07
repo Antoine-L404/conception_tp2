@@ -18,7 +18,7 @@ namespace Automate.Services
 
         public User? Authenticate(string username, string password)
         {
-            User? user = users.FindSync(u => u.Username == username).FirstOrDefault();
+            User? user = users.Find(u => u.Username == username).FirstOrDefault();
 
             if (!VerifyPassword(password, user.Password))
                 return null;
