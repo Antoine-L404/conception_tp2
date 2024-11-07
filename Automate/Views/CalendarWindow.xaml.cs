@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Automate.Models;
 using Automate.ViewModels;
@@ -14,8 +15,8 @@ namespace Automate.Views
         public CalendarWindow()
         {
             InitializeComponent();
-            DataContext = new CalendarViewModel();
-            _calendarCommand = new CalendarCommand
+            DataContext = new CalendarViewModel(this);
+            _calendarCommand = new CalendarCommand(this)
             {
                 Calendar = myCalendar,
                 EventTitle = eventTitle,
@@ -40,6 +41,10 @@ namespace Automate.Views
             }
         }
 
+        public void ModifyCalendar(Calendar calendar)
+        {
+            myCalendar = calendar;
+        }
 
 
 

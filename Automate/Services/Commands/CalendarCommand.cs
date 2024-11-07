@@ -9,17 +9,19 @@ using System.Windows.Controls.Primitives;
 using Automate.Utils.Constants;
 using System.Linq;
 using Automate.Views;
+using Automate.ViewModels;
 
 public class CalendarCommand : ICommand
 {
     private readonly List<UpcomingTask> tasks;
-
+    private readonly CalendarWindow _calendarWindow;
     public Calendar Calendar { get; set; }
     public TextBlock EventTitle { get; set; }
     public TextBlock EventDate { get; set; }
 
-    public CalendarCommand()
+    public CalendarCommand(CalendarWindow calendarWindow)
     {
+        _calendarWindow = calendarWindow;
         EventTitle = new TextBlock { Text = "Aucun événement" };
         EventDate = new TextBlock { Text = "" };
 
@@ -31,17 +33,16 @@ public class CalendarCommand : ICommand
             new UpcomingTask { Title = EventType.Arrosage, EventDate = new DateTime(2024, 11, 20) },
             new UpcomingTask { Title = EventType.Recolte, EventDate = new DateTime(2024, 11, 30) }
         };
-
-
     }
 
     public bool CanExecute(object parameter) => true;
 
     public void Execute(object parameter)
     {
-        if (parameter is Calendar)
+        if (parameter is Calendar myCalendar)
         {
             HighlightEventDates();
+            Calendar = myCalendar;
         }
         else if (parameter is MouseButtonEventArgs e)
         {
@@ -58,7 +59,6 @@ public class CalendarCommand : ICommand
                     OpenEventForm(action);
                     break;
             }
-            
         }
     }
 
@@ -98,7 +98,7 @@ public class CalendarCommand : ICommand
     {
         tasks.Add(newTask);
         HighlightEventDates();
-        CalendarCommand _calendarCommand = new CalendarCommand();
+        CalendarCommand _calendarCommand = new CalendarCommand(_calendarWindow);
         ShowTaskDetails(newTask.EventDate);
     }
 
@@ -127,7 +127,7 @@ public class CalendarCommand : ICommand
         //}
         tasks.Add(newTask);
         HighlightEventDates();
-        CalendarCommand _calendarCommand = new CalendarCommand();
+        CalendarCommand _calendarCommand = new CalendarCommand(_calendarWindow);
         ShowTaskDetails(newTask.EventDate);
     }
 
@@ -177,6 +177,8 @@ public class CalendarCommand : ICommand
                 calendarDayButton.Background = isEvent ? new SolidColorBrush(Colors.LightCoral) : new SolidColorBrush(Colors.Transparent);
             }
         }
+        _calendarWindow.ModifyCalendar(Calendar);
+
     }
 
     private void ClickOnDate(MouseButtonEventArgs e)
