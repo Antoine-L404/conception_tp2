@@ -43,14 +43,13 @@ public class CalendarCommand : ICommand
             HighlightEventDates();
             Calendar = myCalendar;
         }
-        else if (parameter is MouseButtonEventArgs e)
-        {
-            ClickOnDate(e);
-        }
         else if (parameter is CalendarAction action)
         {
             switch (action.ActionType)
             {
+                case CalendarActionType.Click:
+                    ShowTaskDetails(action.Date);
+                    break;
                 case CalendarActionType.Delete:
                     DeleteEvent(action.Date);
                     break;
@@ -176,17 +175,6 @@ public class CalendarCommand : ICommand
 
     }
 
-    private void ClickOnDate(MouseButtonEventArgs e)
-    {
-        var calendarDayButton = FindParent<CalendarDayButton>(e.OriginalSource as DependencyObject);
-
-        if (calendarDayButton != null && calendarDayButton.DataContext is DateTime selectedDate)
-        {
-            ShowTaskDetails(selectedDate);
-            e.Handled = true;
-        }
-    }
-
     public void ShowTaskDetails(DateTime selectedDate)
     {
         var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
@@ -202,16 +190,6 @@ public class CalendarCommand : ICommand
         }
     }
 
-
-    private static T FindParent<T>(DependencyObject child) where T : DependencyObject
-    {
-        DependencyObject parentObject = VisualTreeHelper.GetParent(child);
-        if (parentObject == null)
-            return null;
-        if (parentObject is T parent)
-            return parent;
-        return FindParent<T>(parentObject);
-    }
 
     private static List<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
     {

@@ -10,7 +10,8 @@ namespace Automate.Utils.Constants
     {
         Add,
         Edit,
-        Delete
+        Delete,
+        Click
     }
 
     public class CalendarAction

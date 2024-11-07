@@ -12,6 +12,7 @@ public class CalendarViewModel
     public ICommand OnAddEventClick { get; }
     public ICommand OnEditEventClick { get; }
     public ICommand OnDeleteEventClick { get; }
+    public ICommand ClickOnDate {  get; }
     public Calendar Calendar { get; set; }
     public TextBlock EventTitle { get; set; }
     public TextBlock EventDate { get; set; }
@@ -42,6 +43,20 @@ public class CalendarViewModel
         OnAddEventClick = new RelayCommand(AddEvent);
         OnEditEventClick = new RelayCommand(EditEvent);
         OnDeleteEventClick = new RelayCommand(DeleteEvent);
+        ClickOnDate = new RelayCommand(ClickEvent);
+
+    }
+
+    private void ClickEvent()
+    {
+        if (selectedDate != null)
+        {
+            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Click, selectedDate.Value));
+        }
+        else
+        {
+            MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private void AddEvent()
