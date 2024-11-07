@@ -8,7 +8,6 @@
             <Calendar x:Name="myCalendar" Margin="20" SelectionMode="SingleDate"
                       IsTodayHighlighted="True"
                       Loaded="CalendarLoaded" 
-                      PreviewMouseLeftButtonDown="OnCalendarDateClicked"
                       SelectedDate="{Binding SelectedDate}">
             </Calendar>
 

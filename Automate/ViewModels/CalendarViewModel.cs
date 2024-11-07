@@ -4,6 +4,7 @@ using Automate.Views;
 using System.Windows.Input;
 using System.Windows;
 using System;
+using System.Windows.Controls;
 
 public class CalendarViewModel
 {
@@ -11,6 +12,9 @@ public class CalendarViewModel
     public ICommand OnAddEventClick { get; }
     public ICommand OnEditEventClick { get; }
     public ICommand OnDeleteEventClick { get; }
+    public Calendar Calendar { get; set; }
+    public TextBlock EventTitle { get; set; }
+    public TextBlock EventDate { get; set; }
 
     private DateTime? selectedDate;
     public DateTime? SelectedDate
@@ -23,9 +27,18 @@ public class CalendarViewModel
     }
 
     // Modifie le constructeur pour accepter `CalendarWindow`
-    public CalendarViewModel(CalendarWindow calendarWindow)
+    public CalendarViewModel(Calendar myCalendar, TextBlock eventTitle, TextBlock eventDate)
     {
-        CalendarCommand = new CalendarCommand(calendarWindow);
+        this.Calendar = myCalendar;
+        this.EventTitle = eventTitle;
+        this.EventDate = eventDate;
+
+        CalendarCommand = new CalendarCommand()
+        {
+            Calendar = myCalendar,
+            EventTitle = eventTitle,
+            EventDate = eventDate
+        };
 
         OnAddEventClick = new RelayCommand(AddEvent);
         OnEditEventClick = new RelayCommand(EditEvent);

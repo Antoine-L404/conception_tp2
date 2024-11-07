@@ -19,9 +19,8 @@ public class CalendarCommand : ICommand
     public TextBlock EventTitle { get; set; }
     public TextBlock EventDate { get; set; }
 
-    public CalendarCommand(CalendarWindow calendarWindow)
+    public CalendarCommand()
     {
-        _calendarWindow = calendarWindow;
         EventTitle = new TextBlock { Text = "Aucun événement" };
         EventDate = new TextBlock { Text = "" };
 
@@ -98,7 +97,7 @@ public class CalendarCommand : ICommand
     {
         tasks.Add(newTask);
         HighlightEventDates();
-        CalendarCommand _calendarCommand = new CalendarCommand(_calendarWindow);
+        CalendarCommand _calendarCommand = new CalendarCommand();
         ShowTaskDetails(newTask.EventDate);
     }
 
@@ -127,7 +126,7 @@ public class CalendarCommand : ICommand
         //}
         tasks.Add(newTask);
         HighlightEventDates();
-        CalendarCommand _calendarCommand = new CalendarCommand(_calendarWindow);
+        CalendarCommand _calendarCommand = new CalendarCommand();
         ShowTaskDetails(newTask.EventDate);
     }
 
@@ -177,7 +176,6 @@ public class CalendarCommand : ICommand
                 calendarDayButton.Background = isEvent ? new SolidColorBrush(Colors.LightCoral) : new SolidColorBrush(Colors.Transparent);
             }
         }
-        _calendarWindow.ModifyCalendar(Calendar);
 
     }
 

@@ -15,8 +15,8 @@ namespace Automate.Views
         public CalendarWindow()
         {
             InitializeComponent();
-            DataContext = new CalendarViewModel(this);
-            _calendarCommand = new CalendarCommand(this)
+            DataContext = new CalendarViewModel(myCalendar, eventTitle, eventDate);
+            _calendarCommand = new CalendarCommand
             {
                 Calendar = myCalendar,
                 EventTitle = eventTitle,
@@ -31,55 +31,6 @@ namespace Automate.Views
             selectedDate = DateTime.Today;
             _calendarCommand.ShowTaskDetails(selectedDate.Value);
         }
-
-        private void OnCalendarDateClicked(object sender, MouseButtonEventArgs e)
-        {
-            if (myCalendar.SelectedDate.HasValue)
-            {
-                selectedDate = myCalendar.SelectedDate.Value;
-                _calendarCommand.ShowTaskDetails(selectedDate.Value); 
-            }
-        }
-
-        public void ModifyCalendar(Calendar calendar)
-        {
-            myCalendar = calendar;
-        }
-
-
-
-        private void OnEditEventClick(object sender, RoutedEventArgs e)
-        {
-            if (selectedDate.HasValue)
-            {
-                var existingTask = _calendarCommand.GetEventForDate(selectedDate.Value);
-                if (existingTask != null)
-                {
-                    TaskFormWindow eventForm = new TaskFormWindow(selectedDate.Value, existingTask.Title);
-                    eventForm.ShowDialog();
-
-                    if (eventForm.IsConfirmed)
-                    {
-                        existingTask.Title = eventForm.SelectedEventType;
-                        existingTask.EventDate = eventForm.EventDate;
-                        MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
-
-                        _calendarCommand.Execute(myCalendar);
-                        _calendarCommand.ShowTaskDetails(eventForm.EventDate);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Aucun événement à modifier pour cette date.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-
 
     }
 }
