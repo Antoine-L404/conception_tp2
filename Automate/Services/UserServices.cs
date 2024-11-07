@@ -1,7 +1,6 @@
 ﻿using Automate.Models;
 using BC = BCrypt.Net.BCrypt;
 using MongoDB.Driver;
-using System.Linq;
 using Automate.Utils.Constants;
 using Automate.Abstract.Services;
 
@@ -32,12 +31,5 @@ namespace Automate.Services
         }
 
         public bool VerifyPassword(string password, string hashPassword) => BC.Verify(password, hashPassword);
-
-        public string HashPassword(string password) => BC.HashPassword(password);
-
-        public void RegisterUser(User user)
-        {
-            users.InsertOne(user);
-        }
     }
 }
