@@ -47,8 +47,14 @@ public class CalendarCommand : ICommand
         {
             switch (action.ActionType)
             {
+                case CalendarActionType.MonthChanged:
+                    HighlightEventDates();
+                    break;
                 case CalendarActionType.Click:
                     ShowTaskDetails(action.Date);
+                    break;
+                case CalendarActionType.Edit:
+                    EditEvent(action.Date);
                     break;
                 case CalendarActionType.Delete:
                     DeleteEvent(action.Date);
@@ -73,15 +79,9 @@ public class CalendarCommand : ICommand
                 EventDate = eventForm.EventDate
             };
 
-            switch (action.ActionType)
-            {
-                case CalendarActionType.Add:
-                    AddEvent(newTask);
-                    break;
-                case CalendarActionType.Edit:
-                    EditEvent(newTask);
-                    break;
-            }
+
+            AddEvent(newTask);
+
 
             MessageBox.Show($"Événement '{eventForm.SelectedEventType}' ajouté pour le {eventForm.EventDate.ToShortDateString()}");
         }
@@ -100,13 +100,13 @@ public class CalendarCommand : ICommand
         ShowTaskDetails(newTask.EventDate);
     }
 
-    public void EditEvent(UpcomingTask newTask)
+    public void EditEvent(DateTime date)
     {
-        var existingTask = GetEventForDate(newTask.EventDate);
+        var existingTask = GetEventForDate(date);
 
         if (existingTask != null)
         {
-            TaskFormWindow eventForm = new TaskFormWindow(newTask.EventDate, existingTask.Title);
+            TaskFormWindow eventForm = new TaskFormWindow(date, existingTask.Title);
             eventForm.ShowDialog();
 
             if (eventForm.IsConfirmed)
@@ -191,6 +191,14 @@ public class CalendarCommand : ICommand
     }
 
 
+    public UpcomingTask GetEventForDate(DateTime date)
+    {
+        return tasks.FirstOrDefault(task => task.EventDate.Date == date.Date);
+    }
+
+
+
+    // Accepté par Laurent, fait par l'AI
     private static List<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
     {
         var results = new List<T>();
@@ -211,12 +219,6 @@ public class CalendarCommand : ICommand
 
         return results;
     }
-
-    public UpcomingTask GetEventForDate(DateTime date)
-    {
-        return tasks.FirstOrDefault(task => task.EventDate.Date == date.Date);
-    }
-
 
     public event EventHandler CanExecuteChanged;
 }

@@ -15,6 +15,10 @@ xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
                     <i:EventTrigger EventName="SelectedDatesChanged">
                         <behaviors:InvokeCommandAction Command="{Binding ClickOnDate}" />
                     </i:EventTrigger>
+
+                    <i:EventTrigger EventName="DisplayDateChanged">
+                        <i:InvokeCommandAction Command="{Binding OnMonthChanged}" />
+                    </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Calendar>
 

@@ -12,6 +12,7 @@ public class CalendarViewModel
     public ICommand OnAddEventClick { get; }
     public ICommand OnEditEventClick { get; }
     public ICommand OnDeleteEventClick { get; }
+    public ICommand OnMonthChanged { get; }
     public ICommand ClickOnDate {  get; }
     public Calendar Calendar { get; set; }
     public TextBlock EventTitle { get; set; }
@@ -44,9 +45,16 @@ public class CalendarViewModel
         OnEditEventClick = new RelayCommand(EditEvent);
         OnDeleteEventClick = new RelayCommand(DeleteEvent);
         ClickOnDate = new RelayCommand(ClickEvent);
+        OnMonthChanged = new RelayCommand(MonthChanged);
 
     }
 
+    private void MonthChanged()
+    {
+
+       CalendarCommand.Execute(new CalendarAction(CalendarActionType.MonthChanged));
+
+    }
     private void ClickEvent()
     {
         if (selectedDate != null)

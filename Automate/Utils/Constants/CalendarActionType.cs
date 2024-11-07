@@ -11,7 +11,8 @@ namespace Automate.Utils.Constants
         Add,
         Edit,
         Delete,
-        Click
+        Click,
+        MonthChanged
     }
 
     public class CalendarAction
@@ -19,6 +20,10 @@ namespace Automate.Utils.Constants
         public CalendarActionType ActionType { get; }
         public DateTime Date { get; }
 
+        public CalendarAction(CalendarActionType actionType)
+        {
+            ActionType = actionType;
+        }
         public CalendarAction(CalendarActionType actionType, DateTime date)
         {
             ActionType = actionType;
