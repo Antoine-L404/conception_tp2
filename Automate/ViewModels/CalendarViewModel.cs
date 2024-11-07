@@ -26,7 +26,6 @@ public class CalendarViewModel
         }
     }
 
-    // Modifie le constructeur pour accepter `CalendarWindow`
     public CalendarViewModel(Calendar myCalendar, TextBlock eventTitle, TextBlock eventDate)
     {
         this.Calendar = myCalendar;

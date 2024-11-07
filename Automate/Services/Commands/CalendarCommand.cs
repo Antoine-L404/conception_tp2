@@ -103,32 +103,29 @@ public class CalendarCommand : ICommand
 
     public void EditEvent(UpcomingTask newTask)
     {
-        // TODO Convertir ceci pour fonctionnel en commande
-        //var existingTask = _calendarCommand.GetEventForDate(selectedDate.Value);
-        //if (existingTask != null)
-        //{
-        //    TaskFormWindow eventForm = new TaskFormWindow(selectedDate.Value, existingTask.Title);
-        //    eventForm.ShowDialog();
+        var existingTask = GetEventForDate(newTask.EventDate);
 
-        //    if (eventForm.IsConfirmed)
-        //    {
-        //        existingTask.Title = eventForm.SelectedEventType;
-        //        existingTask.EventDate = eventForm.EventDate;
-        //        MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
+        if (existingTask != null)
+        {
+            TaskFormWindow eventForm = new TaskFormWindow(newTask.EventDate, existingTask.Title);
+            eventForm.ShowDialog();
 
-        //        _calendarCommand.Execute(myCalendar);
-        //        _calendarCommand.ShowTaskDetails(eventForm.EventDate);
-        //    }
-        //}
-        //else
-        //{
-        //    MessageBox.Show("Aucun événement à modifier pour cette date.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-        //}
-        tasks.Add(newTask);
-        HighlightEventDates();
-        CalendarCommand _calendarCommand = new CalendarCommand();
-        ShowTaskDetails(newTask.EventDate);
+            if (eventForm.IsConfirmed)
+            {
+                existingTask.Title = eventForm.SelectedEventType;
+                existingTask.EventDate = eventForm.EventDate;
+                MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
+
+                HighlightEventDates();
+                ShowTaskDetails(eventForm.EventDate);
+            }
+        }
+        else
+        {
+            MessageBox.Show("Aucun événement à modifier pour cette date.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
+
 
     public void DeleteEvent(DateTime date)
     {
