@@ -6,7 +6,7 @@ using Automate.Abstract.Services;
 
 namespace Automate.Services
 {
-    public class UserServices
+    public class UserServices : IUserServices
     {
         private readonly IMongoCollection<User> users;
         private readonly IMongoDBServices mongoDBService;

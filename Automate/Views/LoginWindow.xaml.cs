@@ -1,4 +1,5 @@
-﻿using Automate.ViewModels;
+﻿using Automate.Utils;
+using Automate.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -12,7 +13,7 @@ namespace Automate
         public LoginWindow()
         {
             InitializeComponent();
-            DataContext = new LoginViewModel(this);
+            DataContext = new LoginViewModel(this, Environment.mongoService, Environment.userServices);
         }
 
         //pas le choix d'utiliser un événement, on ne peut pas BIND un password pour des raisons de sécurité

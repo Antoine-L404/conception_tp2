@@ -1,4 +1,5 @@
-﻿using Automate.Models;
+﻿using Automate.Abstract.Services;
+using Automate.Models;
 using Automate.Services;
 using Automate.Services.Commands;
 using Automate.Utils;
@@ -17,13 +18,14 @@ namespace Automate.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
-        private readonly MongoDBServices mongoService;
-        private readonly UserServices userServices;
+        private readonly IMongoDBServices mongoDBService;
+        private readonly IUserServices userServices;
         private readonly NavigationUtils navigationUtils;
 
         private string? username;
         private string? password;
-        
+
+
         private Window window;
 
         private ErrorsCollection errorsCollection;
@@ -35,10 +37,11 @@ namespace Automate.ViewModels
         public bool HasErrors => errorsCollection.ContainsAnyError();
         public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(Password));
 
-        public LoginViewModel(Window openedWindow)
+
+        public LoginViewModel(Window openedWindow, IMongoDBServices mongoDBServices, IUserServices userServices)
         {
-            mongoService = new MongoDBServices(DBConstants.DB_NAME);
-            userServices = new UserServices(mongoService);
+            this.mongoDBService = mongoDBServices;
+            this.userServices = userServices;
             AuthenticateCommand = new RelayCommand(Authenticate);
 
             navigationUtils = new NavigationUtils();
