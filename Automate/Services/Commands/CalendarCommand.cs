@@ -210,6 +210,7 @@ public class CalendarCommand : ICommand
         }
     }
 
+    // Faite avec ai, mais accepter par Laurent
     private static List<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
     {
         var results = new List<T>();
