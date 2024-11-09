@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Automate.Models;
+using Automate.Services;
 using Automate.ViewModels;
 
 namespace Automate.Views
@@ -18,7 +19,9 @@ namespace Automate.Views
         {
             InitializeComponent();
             DataContext = new CalendarViewModel(myCalendar, eventTitle);
-            _calendarCommand = new CalendarCommand
+            var mongoDBService = new MongoDBServices("Automate");
+            var taskService = new TaskCRUDService(mongoDBService);
+            _calendarCommand = new CalendarCommand(taskService)
             {
                 Calendar = myCalendar,
                 EventTitles = eventTitle,

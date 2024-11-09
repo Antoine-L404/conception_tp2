@@ -10,6 +10,8 @@ using Automate.Utils.Constants;
 using System.Linq;
 using System.Collections.ObjectModel;
 using Automate.Views;
+using Automate.Services;
+using MongoDB.Driver;
 
 public class CalendarCommand : ICommand
 {
@@ -18,19 +20,31 @@ public class CalendarCommand : ICommand
     public string SelectedEventTitle { get; set; }
     public DateTime? SelectedDate { get; set; }
     public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
+    private readonly TaskCRUDService taskService;
 
-    public CalendarCommand()
+    public CalendarCommand(TaskCRUDService taskService)
     {
+        this.taskService = taskService;
+        tasks = new List<UpcomingTask>();
         EventTitles.Add("Aucun événement");
 
-        tasks = new List<UpcomingTask>
+        LoadTasksFromDatabase();
+    }
+
+    private void LoadTasksFromDatabase()
+    {
+        var taskList = taskService.GetAllTasks();
+        tasks.Clear();
+        tasks.AddRange(taskList);
+
+        if (tasks.Any())
         {
-            new UpcomingTask { Title = EventType.Semis, EventDate = new DateTime(2024, 11, 10) },
-            new UpcomingTask { Title = EventType.Rempotage, EventDate = new DateTime(2024, 11, 12) },
-            new UpcomingTask { Title = EventType.Entretien, EventDate = new DateTime(2024, 11, 15) },
-            new UpcomingTask { Title = EventType.Arrosage, EventDate = new DateTime(2024, 11, 20) },
-            new UpcomingTask { Title = EventType.Recolte, EventDate = new DateTime(2024, 11, 30) }
-        };
+            HighlightEventDates();
+        }
+        else
+        {
+            EventTitles.Add("Aucun événement");
+        }
     }
 
     public bool CanExecute(object parameter) => SelectedDate.HasValue && !string.IsNullOrEmpty(SelectedEventTitle);
@@ -89,6 +103,7 @@ public class CalendarCommand : ICommand
 
     public void AddEvent(UpcomingTask newTask)
     {
+        taskService.CreateTask(newTask);
         tasks.Add(newTask);
         HighlightEventDates();
         ShowTaskDetails(newTask.EventDate);
@@ -113,6 +128,13 @@ public class CalendarCommand : ICommand
             {
                 existingTask.Title = eventForm.SelectedEventType;
                 existingTask.EventDate = eventForm.EventDate;
+
+                // Mise à jour dans MongoDB
+                var updates = Builders<UpcomingTask>.Update
+                    .Set(t => t.Title, eventForm.SelectedEventType)
+                    .Set(t => t.EventDate, eventForm.EventDate);
+                taskService.UpdateTask(existingTask.Id, updates);
+
                 MessageBox.Show($"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
 
                 HighlightEventDates();
@@ -125,6 +147,7 @@ public class CalendarCommand : ICommand
         }
     }
 
+
     public void DeleteEvent(DateTime date)
     {
         var result = MessageBox.Show($"Voulez-vous vraiment supprimer l'événement du {date.ToShortDateString()} ?", "Confirmation de suppression", MessageBoxButton.YesNo, MessageBoxImage.Warning);
@@ -135,7 +158,8 @@ public class CalendarCommand : ICommand
 
             if (taskToDelete != null)
             {
-                tasks.Remove(taskToDelete);
+                taskService.DeleteTask(taskToDelete.Id); // Supprime la tâche de MongoDB
+                tasks.Remove(taskToDelete);              // Supprime localement
                 HighlightEventDates();
                 ClearTaskDetails();
                 MessageBox.Show("Événement supprimé avec succès.");
@@ -146,6 +170,7 @@ public class CalendarCommand : ICommand
             }
         }
     }
+
 
     private void ClearTaskDetails()
     {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Automate.Services
 {
-    class TaskCRUDService
+    public class TaskCRUDService
     {
         private readonly IMongoCollection<UpcomingTask> tasks;
 

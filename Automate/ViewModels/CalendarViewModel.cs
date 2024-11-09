@@ -6,6 +6,7 @@ using System.Windows;
 using System;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
+using Automate.Services;
 
 public class CalendarViewModel
 {
@@ -43,7 +44,9 @@ public class CalendarViewModel
         this.Calendar = myCalendar;
         this.EventTitles = eventTitles;
 
-        CalendarCommand = new CalendarCommand()
+        var mongoDBService = new MongoDBServices("Automate");
+        var taskService = new TaskCRUDService(mongoDBService);
+        CalendarCommand = new CalendarCommand(taskService)
         {
             Calendar = myCalendar,
             EventTitles = eventTitles,
