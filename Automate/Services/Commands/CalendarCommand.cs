@@ -8,21 +8,18 @@ using System;
 using System.Windows.Controls.Primitives;
 using Automate.Utils.Constants;
 using System.Linq;
+using System.Collections.ObjectModel;
 using Automate.Views;
-using Automate.ViewModels;
 
 public class CalendarCommand : ICommand
 {
     private readonly List<UpcomingTask> tasks;
-    private readonly CalendarWindow _calendarWindow;
     public Calendar Calendar { get; set; }
-    public TextBlock EventTitle { get; set; }
-    public TextBlock EventDate { get; set; }
+    public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
 
     public CalendarCommand()
     {
-        EventTitle = new TextBlock { Text = "Aucun événement" };
-        EventDate = new TextBlock { Text = "" };
+        EventTitles.Add("Aucun événement");
 
         tasks = new List<UpcomingTask>
         {
@@ -40,8 +37,8 @@ public class CalendarCommand : ICommand
     {
         if (parameter is Calendar myCalendar)
         {
-            HighlightEventDates();
             Calendar = myCalendar;
+            HighlightEventDates();
         }
         else if (parameter is CalendarAction action)
         {
@@ -68,7 +65,7 @@ public class CalendarCommand : ICommand
 
     private void OpenEventForm(CalendarAction action)
     {
-        TaskFormWindow eventForm = new TaskFormWindow(action.Date);
+        var eventForm = new TaskFormWindow(action.Date);
         eventForm.ShowDialog();
 
         if (eventForm.IsConfirmed)
@@ -79,10 +76,7 @@ public class CalendarCommand : ICommand
                 EventDate = eventForm.EventDate
             };
 
-
             AddEvent(newTask);
-
-
             MessageBox.Show($"Événement '{eventForm.SelectedEventType}' ajouté pour le {eventForm.EventDate.ToShortDateString()}");
         }
         else
@@ -91,12 +85,10 @@ public class CalendarCommand : ICommand
         }
     }
 
-
     public void AddEvent(UpcomingTask newTask)
     {
         tasks.Add(newTask);
         HighlightEventDates();
-        CalendarCommand _calendarCommand = new CalendarCommand();
         ShowTaskDetails(newTask.EventDate);
     }
 
@@ -106,7 +98,7 @@ public class CalendarCommand : ICommand
 
         if (existingTask != null)
         {
-            TaskFormWindow eventForm = new TaskFormWindow(date, existingTask.Title);
+            var eventForm = new TaskFormWindow(date, existingTask.Title);
             eventForm.ShowDialog();
 
             if (eventForm.IsConfirmed)
@@ -125,13 +117,9 @@ public class CalendarCommand : ICommand
         }
     }
 
-
     public void DeleteEvent(DateTime date)
     {
-        var result = MessageBox.Show($"Voulez-vous vraiment supprimer l'événement du {date.ToShortDateString()} ?",
-                                     "Confirmation de suppression",
-                                     MessageBoxButton.YesNo,
-                                     MessageBoxImage.Warning);
+        var result = MessageBox.Show($"Voulez-vous vraiment supprimer l'événement du {date.ToShortDateString()} ?", "Confirmation de suppression", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
         if (result == MessageBoxResult.Yes)
         {
@@ -142,7 +130,6 @@ public class CalendarCommand : ICommand
                 tasks.Remove(taskToDelete);
                 HighlightEventDates();
                 ClearTaskDetails();
-
                 MessageBox.Show("Événement supprimé avec succès.");
             }
             else
@@ -152,12 +139,10 @@ public class CalendarCommand : ICommand
         }
     }
 
-
-
     private void ClearTaskDetails()
     {
-        EventTitle.Text = "Aucun événement";
-        EventDate.Text = "";
+        EventTitles.Clear();
+        EventTitles.Add("Aucun événement");
     }
 
     private void HighlightEventDates()
@@ -172,33 +157,17 @@ public class CalendarCommand : ICommand
                 calendarDayButton.Background = isEvent ? new SolidColorBrush(Colors.LightCoral) : new SolidColorBrush(Colors.Transparent);
             }
         }
-
     }
 
     public void ShowTaskDetails(DateTime selectedDate)
     {
-        var upcomingTask = tasks.Find(task => task.EventDate.Date == selectedDate.Date);
-        if (upcomingTask != null)
-        {
-            EventTitle.Text = upcomingTask.Title.ToString();
-            EventDate.Text = $"Date sélectionnée : {selectedDate.ToShortDateString()}";
-        }
-        else
-        {
-            EventTitle.Text = "Aucun événement";
-            EventDate.Text = "";
-        }
+        EventTitles.Clear();
+        var upcomingTask = tasks.FirstOrDefault(task => task.EventDate.Date == selectedDate.Date);
+        EventTitles.Add(upcomingTask?.Title.ToString() ?? "Aucun événement");
     }
 
+    public UpcomingTask GetEventForDate(DateTime date) => tasks.FirstOrDefault(task => task.EventDate.Date == date.Date);
 
-    public UpcomingTask GetEventForDate(DateTime date)
-    {
-        return tasks.FirstOrDefault(task => task.EventDate.Date == date.Date);
-    }
-
-
-
-    // Accepté par Laurent, fait par l'AI
     private static List<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
     {
         var results = new List<T>();
@@ -207,12 +176,8 @@ public class CalendarCommand : ICommand
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
             {
-                DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                if (child != null && child is T tChild)
-                {
-                    results.Add(tChild);
-                }
-
+                var child = VisualTreeHelper.GetChild(depObj, i);
+                if (child is T tChild) results.Add(tChild);
                 results.AddRange(FindVisualChildren<T>(child));
             }
         }
@@ -220,5 +185,9 @@ public class CalendarCommand : ICommand
         return results;
     }
 
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 }

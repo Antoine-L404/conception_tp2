@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows;
 using System;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 public class CalendarViewModel
 {
@@ -15,8 +16,7 @@ public class CalendarViewModel
     public ICommand OnMonthChanged { get; }
     public ICommand ClickOnDate {  get; }
     public Calendar Calendar { get; set; }
-    public TextBlock EventTitle { get; set; }
-    public TextBlock EventDate { get; set; }
+    public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
 
     private DateTime? selectedDate;
     public DateTime? SelectedDate
@@ -28,17 +28,15 @@ public class CalendarViewModel
         }
     }
 
-    public CalendarViewModel(Calendar myCalendar, TextBlock eventTitle, TextBlock eventDate)
+    public CalendarViewModel(Calendar myCalendar, ObservableCollection<string> eventTitles)
     {
         this.Calendar = myCalendar;
-        this.EventTitle = eventTitle;
-        this.EventDate = eventDate;
+        this.EventTitles = eventTitles;
 
         CalendarCommand = new CalendarCommand()
         {
             Calendar = myCalendar,
-            EventTitle = eventTitle,
-            EventDate = eventDate
+            EventTitles = eventTitles,
         };
 
         OnAddEventClick = new RelayCommand(AddEvent);
@@ -46,8 +44,8 @@ public class CalendarViewModel
         OnDeleteEventClick = new RelayCommand(DeleteEvent);
         ClickOnDate = new RelayCommand(ClickEvent);
         OnMonthChanged = new RelayCommand(MonthChanged);
-
     }
+
 
     private void MonthChanged()
     {

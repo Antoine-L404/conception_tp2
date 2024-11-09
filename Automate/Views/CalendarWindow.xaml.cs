@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,16 +12,16 @@ namespace Automate.Views
     {
         private DateTime? selectedDate;
         private readonly CalendarCommand _calendarCommand;
+        private ObservableCollection<string> eventTitle = new ObservableCollection<string>();
 
         public CalendarWindow()
         {
             InitializeComponent();
-            DataContext = new CalendarViewModel(myCalendar, eventTitle, eventDate);
+            DataContext = new CalendarViewModel(myCalendar, eventTitle);
             _calendarCommand = new CalendarCommand
             {
                 Calendar = myCalendar,
-                EventTitle = eventTitle,
-                EventDate = eventDate
+                EventTitles = eventTitle,
             };
         }
 
