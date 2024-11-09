@@ -19,8 +19,9 @@ namespace Automate.Utils.Constants
     {
         public CalendarActionType ActionType { get; }
         public DateTime Date { get; }
+        public string Title { get; }
 
-        public CalendarAction(CalendarActionType actionType)
+    public CalendarAction(CalendarActionType actionType)
         {
             ActionType = actionType;
         }
@@ -28,6 +29,13 @@ namespace Automate.Utils.Constants
         {
             ActionType = actionType;
             Date = date;
+        }
+
+        public CalendarAction(CalendarActionType actionType, DateTime date, string selectedEventTitle)
+        {
+            ActionType = actionType;
+            Date = date;
+            Title = selectedEventTitle;
         }
     }
 }

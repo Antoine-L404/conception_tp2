@@ -28,6 +28,16 @@ public class CalendarViewModel
         }
     }
 
+    private string? selectedEventTitle;
+    public string? SelectedEventTitle
+    {
+        get => selectedEventTitle;
+        set
+        {
+            selectedEventTitle = value;
+        }
+    }
+
     public CalendarViewModel(Calendar myCalendar, ObservableCollection<string> eventTitles)
     {
         this.Calendar = myCalendar;
@@ -81,7 +91,7 @@ public class CalendarViewModel
     {
         if (selectedDate is not null)
         {
-            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Edit, selectedDate.Value));
+            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Edit, selectedDate.Value, selectedEventTitle));
         }
         else
         {

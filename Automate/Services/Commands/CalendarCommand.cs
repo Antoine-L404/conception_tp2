@@ -53,7 +53,7 @@ public class CalendarCommand : ICommand
                     ShowTaskDetails(action.Date);
                     break;
                 case CalendarActionType.Edit:
-                    EditEvent();
+                    EditEvent(action);
                     break;
                 case CalendarActionType.Delete:
                     DeleteEvent(action.Date);
@@ -94,19 +94,19 @@ public class CalendarCommand : ICommand
         ShowTaskDetails(newTask.EventDate);
     }
 
-    private void EditEvent()
+    private void EditEvent(CalendarAction action)
     {
-        if (SelectedDate == null || string.IsNullOrEmpty(SelectedEventTitle))
+        if (action.Date == null || string.IsNullOrEmpty(action.Title))
         {
             MessageBox.Show("Veuillez sélectionner une date et un événement dans la liste.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        var existingTask = tasks.FirstOrDefault(task => task.EventDate.Date == SelectedDate.Value.Date && task.Title.ToString() == SelectedEventTitle);
+        var existingTask = tasks.FirstOrDefault(task => task.EventDate.Date == action.Date && task.Title.ToString() == action.Title);
 
         if (existingTask != null)
         {
-            var eventForm = new TaskFormWindow(SelectedDate.Value, existingTask.Title);
+            var eventForm = new TaskFormWindow(action.Date, existingTask.Title);
             eventForm.ShowDialog();
 
             if (eventForm.IsConfirmed)
