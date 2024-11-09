@@ -15,6 +15,8 @@ public class CalendarCommand : ICommand
 {
     private readonly List<UpcomingTask> tasks;
     public Calendar Calendar { get; set; }
+    public string SelectedEventTitle { get; set; }
+    public DateTime? SelectedDate { get; set; }
     public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
 
     public CalendarCommand()
@@ -31,7 +33,7 @@ public class CalendarCommand : ICommand
         };
     }
 
-    public bool CanExecute(object parameter) => true;
+    public bool CanExecute(object parameter) => SelectedDate.HasValue && !string.IsNullOrEmpty(SelectedEventTitle);
 
     public void Execute(object parameter)
     {
@@ -51,7 +53,7 @@ public class CalendarCommand : ICommand
                     ShowTaskDetails(action.Date);
                     break;
                 case CalendarActionType.Edit:
-                    EditEvent(action.Date);
+                    EditEvent();
                     break;
                 case CalendarActionType.Delete:
                     DeleteEvent(action.Date);
@@ -92,13 +94,19 @@ public class CalendarCommand : ICommand
         ShowTaskDetails(newTask.EventDate);
     }
 
-    public void EditEvent(DateTime date)
+    private void EditEvent()
     {
-        var existingTask = GetEventForDate(date);
+        if (SelectedDate == null || string.IsNullOrEmpty(SelectedEventTitle))
+        {
+            MessageBox.Show("Veuillez sélectionner une date et un événement dans la liste.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var existingTask = tasks.FirstOrDefault(task => task.EventDate.Date == SelectedDate.Value.Date && task.Title.ToString() == SelectedEventTitle);
 
         if (existingTask != null)
         {
-            var eventForm = new TaskFormWindow(date, existingTask.Title);
+            var eventForm = new TaskFormWindow(SelectedDate.Value, existingTask.Title);
             eventForm.ShowDialog();
 
             if (eventForm.IsConfirmed)
@@ -162,11 +170,20 @@ public class CalendarCommand : ICommand
     public void ShowTaskDetails(DateTime selectedDate)
     {
         EventTitles.Clear();
-        var upcomingTask = tasks.FirstOrDefault(task => task.EventDate.Date == selectedDate.Date);
-        EventTitles.Add(upcomingTask?.Title.ToString() ?? "Aucun événement");
-    }
+        var eventsForDate = tasks.Where(task => task.EventDate.Date == selectedDate.Date).ToList();
 
-    public UpcomingTask GetEventForDate(DateTime date) => tasks.FirstOrDefault(task => task.EventDate.Date == date.Date);
+        if (eventsForDate.Any())
+        {
+            foreach (var task in eventsForDate)
+            {
+                EventTitles.Add(task.Title.ToString());
+            }
+        }
+        else
+        {
+            EventTitles.Add("Aucun événement");
+        }
+    }
 
     private static List<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
     {
@@ -191,3 +208,4 @@ public class CalendarCommand : ICommand
         remove => CommandManager.RequerySuggested -= value;
     }
 }
+
