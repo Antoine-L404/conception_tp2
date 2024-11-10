@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using Automate.Models;
 using Automate.Services;
-using Automate.ViewModels;
 
 namespace Automate.Views
 {
     public partial class CalendarWindow : Window
     {
         private DateTime? selectedDate;
-        private readonly CalendarCommand _calendarCommand;
+        private readonly CalendarCommand calendarCommand;
         private ObservableCollection<string> eventTitle = new ObservableCollection<string>();
 
         public CalendarWindow()
@@ -21,7 +17,7 @@ namespace Automate.Views
             DataContext = new CalendarViewModel(myCalendar, eventTitle);
             var mongoDBService = new MongoDBServices("Automate");
             var taskService = new TaskCRUDService(mongoDBService);
-            _calendarCommand = new CalendarCommand(taskService)
+            calendarCommand = new CalendarCommand(taskService)
             {
                 Calendar = myCalendar,
                 EventTitles = eventTitle,
@@ -30,10 +26,10 @@ namespace Automate.Views
 
         private void CalendarLoaded(object sender, RoutedEventArgs e)
         {
-            _calendarCommand.Execute(myCalendar);
+            calendarCommand.Execute(myCalendar);
 
             selectedDate = DateTime.Today;
-            _calendarCommand.ShowTaskDetails(selectedDate.Value);
+            calendarCommand.ShowTaskDetails(selectedDate.Value);
         }
 
     }
