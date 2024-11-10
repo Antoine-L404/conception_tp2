@@ -6,6 +6,7 @@ using System;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using Automate.Services;
+using Automate.Utils.Enums;
 
 public class CalendarViewModel
 {

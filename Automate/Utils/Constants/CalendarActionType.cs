@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Automate.Utils.Enums;
+using System;
 
 namespace Automate.Utils.Constants
 {
-    public enum CalendarActionType
-    {
-        Add,
-        Edit,
-        Delete,
-        Click,
-        MonthChanged
-    }
-
     public class CalendarAction
     {
         public CalendarActionType ActionType { get; }

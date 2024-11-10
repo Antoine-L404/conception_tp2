@@ -1,4 +1,4 @@
-﻿using Automate.Utils.Constants;
+﻿using Automate.Utils.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
@@ -13,16 +13,7 @@ namespace Automate.Models
         [BsonElement("Title")]
         public EventType Title { get; set; }
 
-        private DateTime _eventDate;
         [BsonElement("DateEvenement")]
-        public DateTime EventDate
-        {
-            get => _eventDate;
-            set
-            {
-                _eventDate = value; 
-            }
-        }
-
+        public DateTime EventDate { get; set; }
     }
 }
