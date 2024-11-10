@@ -13,7 +13,7 @@ namespace Automate.Models
         [BsonElement("Title")]
         public EventType Title { get; set; }
 
-        [BsonElement("DateEvenement")]
+        [BsonElement("EventDate")]
         public DateTime EventDate { get; set; }
     }
 }
