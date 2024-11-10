@@ -1,6 +1,5 @@
 ﻿using Automate.Models;
 using Automate.Utils.Constants;
-using Automate.Utils.Enums;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -16,16 +15,6 @@ namespace Automate.Services
         public TaskCRUDService(MongoDBServices mongoDBService)
         {
             tasks = mongoDBService.GetCollection<UpcomingTask>(DBConstants.TASKS_COLLECTION_NAME);
-        }
-
-        public UpcomingTask? GetTask(ObjectId taskId)
-        {
-            return tasks.Find(task => task.Id == taskId).FirstOrDefault();
-        }
-
-        public UpcomingTask? GetTaskByDateAndTitle(EventType title, DateTime date)
-        {
-            return tasks.Find(task => task.Title == title && task.EventDate == date).FirstOrDefault();
         }
 
         public List<UpcomingTask> GetTasksByDate(DateTime date)
