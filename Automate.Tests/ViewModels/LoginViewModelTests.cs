@@ -3,7 +3,6 @@ using Automate.Models;
 using Automate.ViewModels;
 using Moq;
 using System.ComponentModel;
-using System.Security.RightsManagement;
 using System.Windows;
 
 namespace Automate.Tests.ViewModels
@@ -18,13 +17,25 @@ namespace Automate.Tests.ViewModels
         private Mock<PropertyChangedEventHandler> mockPropertyChanged;
 
         private readonly User? NULL_USER = null;
-        public LoginViewModelTests() 
+
+        [TestInitialize]
+        public void TestInitialize()
         {
-            mockUserService = new Mock<IUserServices>();
-            mongoDbServicesMock = new Mock<IMongoDBServices>();
-            mockWindow = new Mock<Window>();
-            mockPropertyChanged = new Mock<PropertyChangedEventHandler>();
-            loginViewModel = new LoginViewModel(mockWindow.Object, mongoDbServicesMock.Object, mockUserService.Object);
+            Thread thread = new Thread(() =>
+            {
+                mockUserService = new Mock<IUserServices>();
+                mongoDbServicesMock = new Mock<IMongoDBServices>();
+                mockWindow = new Mock<Window>();
+                mockPropertyChanged = new Mock<PropertyChangedEventHandler>();
+
+                loginViewModel = new LoginViewModel(mockWindow.Object, mongoDbServicesMock.Object, mockUserService.Object, false);
+
+                loginViewModel.PropertyChanged += mockPropertyChanged.Object;
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
         }
 
         [TestMethod]
@@ -39,9 +50,10 @@ namespace Automate.Tests.ViewModels
         [TestMethod]
         public void onPropertyChanged_change_propertyUsername()
         {
+            const string argPropertyName = "Username";
             loginViewModel.Username = "username";
 
-            mockPropertyChanged.Verify(x => x.Invoke(It.IsAny<object>(), It.IsAny<PropertyChangedEventArgs>()), Times.Once());
+            mockPropertyChanged.Verify(x => x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)), Times.Once());
         }
 
         [TestMethod]
@@ -56,15 +68,17 @@ namespace Automate.Tests.ViewModels
         [TestMethod]
         public void onPropertyChanged_change_propertyPassword()
         {
+            const string argPropertyName = "Password";
             loginViewModel.Password = "password";
 
-            mockPropertyChanged.Verify(x => x.Invoke(It.IsAny<object>(), It.IsAny<PropertyChangedEventArgs>()), Times.Once());
+            mockPropertyChanged.Verify(x => x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)), Times.Once());
         }
+
 
         [TestMethod]
         public void Authenticate_UserExists_AuthenticateUser()
         {
-            User validUser = new User { Username = "validUser" };
+            User validUser = new User { Username = "username", Password = "password" };
             const string username = "username";
             const string password = "password";
             loginViewModel.Username = username;

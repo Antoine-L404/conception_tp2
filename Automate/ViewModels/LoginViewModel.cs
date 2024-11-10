@@ -36,12 +36,13 @@ namespace Automate.ViewModels
         public ICommand AuthenticateCommand { get; }
         public bool HasErrors => errorsCollection.ContainsAnyError();
         public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(Password));
+        private readonly bool shouldNavigate;
 
-
-        public LoginViewModel(Window openedWindow, IMongoDBServices mongoDBServices, IUserServices userServices)
+        public LoginViewModel(Window openedWindow, IMongoDBServices mongoDBServices, IUserServices userServices, bool shouldNavigate = true)
         {
             this.mongoDBService = mongoDBServices;
             this.userServices = userServices;
+            this.shouldNavigate = shouldNavigate;
             AuthenticateCommand = new RelayCommand(Authenticate);
 
             navigationUtils = new NavigationUtils();
@@ -100,7 +101,7 @@ namespace Automate.ViewModels
                 NotifyErrorChange();
                 Trace.WriteLine("invalid");
             }
-            else
+            else if(shouldNavigate)
             {
                 navigationUtils.NavigateToAndCloseCurrentWindow<AccueilWindow>(window);
                 Trace.WriteLine("logged in");
