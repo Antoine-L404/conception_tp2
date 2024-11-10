@@ -6,6 +6,7 @@ using System.Linq;
 using Automate.Views;
 using Automate.Services;
 using MongoDB.Driver;
+using Automate.Utils.Enums;
 
 public class CalendarCommand
 {
@@ -24,19 +25,19 @@ public class CalendarCommand
         var eventForm = new TaskFormWindow(taskDate);
         eventForm.ShowDialog();
 
-        if (eventForm.IsConfirmed)
+        if (eventForm.taskFormViewModel.IsConfirmed)
         {
             var newTask = new UpcomingTask
             {
-                Title = eventForm.SelectedEventType,
-                EventDate = eventForm.EventDate
+                Title = (EventType)eventForm.taskFormViewModel.SelectedEventType!,
+                EventDate = taskDate
             };
 
             taskService.CreateTask(newTask);
             tasks.Add(newTask);
 
             MessageBox.Show(
-                $"Événement '{eventForm.SelectedEventType}' ajouté pour le {eventForm.EventDate.ToShortDateString()}");
+                $"Événement '{eventForm.taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
         }
         else
         {
@@ -65,15 +66,15 @@ public class CalendarCommand
         var eventForm = new TaskFormWindow(taskDate, existingTask.Title);
         eventForm.ShowDialog();
 
-        if (eventForm.IsConfirmed)
+        if (eventForm.taskFormViewModel.IsConfirmed)
         {
             var updateDefinition = Builders<UpcomingTask>.Update
-                .Set(t => t.Title, eventForm.SelectedEventType)
-                .Set(t => t.EventDate, eventForm.EventDate);
+                .Set(t => t.Title, eventForm.taskFormViewModel.SelectedEventType)
+                .Set(t => t.EventDate, taskDate);
             taskService.UpdateTask(existingTask.Id, updateDefinition);
 
             MessageBox.Show(
-                $"Événement '{eventForm.SelectedEventType}' modifié pour le {eventForm.EventDate.ToShortDateString()}");
+                $"Événement '{eventForm.taskFormViewModel.SelectedEventType}' modifié pour le {taskDate.ToShortDateString()}");
         }
     }
 

@@ -5,20 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Automate.Views"
         mc:Ignorable="d"
-        Title="TaskFormWindow" Height="450" Width="800">
+        Title="TaskFormWindow" Height="340" Width="301">
     <Grid Margin="20">
         <StackPanel>
             <TextBlock Text="Ajouter / Modifier Événement" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
 
             <TextBlock Text="Type d'événement"/>
-            <ComboBox x:Name="eventTypeComboBox" Margin="0 10" Width="200"/>
+            <ComboBox x:Name="eventTypeComboBox" ItemsSource="{Binding EventTypes}" SelectedItem="{Binding SelectedEventType}" Margin="0 10" Width="200"/>
 
             <TextBlock Text="Date de l'événement" Margin="0,10,0,0"/>
-            <TextBox x:Name="eventDateTextBox" IsReadOnly="True" Width="200" Margin="0 10" HorizontalAlignment="Left" />
+            <TextBox x:Name="eventDateTextBox" Text="{Binding EventDate}" IsReadOnly="True" Width="200" Margin="0 10" HorizontalAlignment="Left" />
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,20,0,0">
-                <Button Content="Ajouter" Width="75" Margin="5" Click="OnAddButtonClick"/>
-                <Button Content="Annuler" Width="75" Margin="5" Click="OnCancelButtonClick"/>
+                <Button Content="Ajouter" Command="{Binding OnAddEventClick}" Width="75" Margin="5"/>
+                <Button Content="Annuler" Command="{Binding OnCancelEventClick}" Width="75" Margin="5"/>
             </StackPanel>
         </StackPanel>
     </Grid>
