@@ -1,6 +1,5 @@
 ﻿using Automate.Services.Commands;
 using Automate.Utils.Constants;
-using Automate.Views;
 using System.Windows.Input;
 using System.Windows;
 using System;
@@ -10,41 +9,29 @@ using Automate.Services;
 
 public class CalendarViewModel
 {
+    private readonly string selectDateErrorMessage = "Veuillez sélectionner une date dans le calendrier.";
+    private readonly string selectEventTitleErrorMessage = "Veuillez sélectionner un événement à modifier.";
+    private readonly string errorTitle = "Erreur";
+
     public CalendarCommand CalendarCommand { get; }
     public ICommand OnAddEventClick { get; }
     public ICommand OnEditEventClick { get; }
     public ICommand OnDeleteEventClick { get; }
     public ICommand OnMonthChanged { get; }
-    public ICommand ClickOnDate {  get; }
+    public ICommand ClickOnDate { get; }
     public Calendar Calendar { get; set; }
     public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
 
-    private DateTime? selectedDate;
-    public DateTime? SelectedDate
-    {
-        get => selectedDate;
-        set
-        {
-            selectedDate = value;
-        }
-    }
+    public DateTime? SelectedDate { get; set; }
 
-    private string? selectedEventTitle;
-    public string? SelectedEventTitle
-    {
-        get => selectedEventTitle;
-        set
-        {
-            selectedEventTitle = value;
-        }
-    }
+    public string? SelectedEventTitle { get; set; }
 
     public CalendarViewModel(Calendar myCalendar, ObservableCollection<string> eventTitles)
     {
-        this.Calendar = myCalendar;
-        this.EventTitles = eventTitles;
+        Calendar = myCalendar;
+        EventTitles = eventTitles;
 
-        var mongoDBService = new MongoDBServices("Automate");
+        var mongoDBService = new MongoDBServices(DBConstants.DB_NAME);
         var taskService = new TaskCRUDService(mongoDBService);
         CalendarCommand = new CalendarCommand(taskService)
         {
@@ -62,55 +49,52 @@ public class CalendarViewModel
 
     private void MonthChanged()
     {
-
-       CalendarCommand.Execute(new CalendarAction(CalendarActionType.MonthChanged));
-
+        CalendarCommand.Execute(new CalendarAction(CalendarActionType.MonthChanged));
     }
+
     private void ClickEvent()
     {
-        if (selectedDate != null)
-        {
-            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Click, selectedDate.Value));
-        }
-        else
-        {
-            MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        if (ValidateSelectedDate())
+            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Click, SelectedDate!.Value));
     }
 
     private void AddEvent()
     {
-        if (selectedDate is not null)
-        {
-            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Add, selectedDate.Value));
-        }
-        else
-        {
-            MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        if (ValidateSelectedDate())
+            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Add, SelectedDate!.Value));
     }
 
     private void EditEvent()
     {
-        if (selectedDate is not null)
-        {
-            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Edit, selectedDate.Value, selectedEventTitle));
-        }
-        else
-        {
-            MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        if (ValidateSelectedDate() && ValidateSelectedEventTitle())
+            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Edit, SelectedDate!.Value, SelectedEventTitle!));
     }
 
     private void DeleteEvent()
     {
-        if (selectedDate is not null)
+        if (ValidateSelectedDate())
+            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Delete, SelectedDate!.Value));
+    }
+
+    private bool ValidateSelectedDate()
+    {
+        if (SelectedDate == null)
         {
-            CalendarCommand.Execute(new CalendarAction(CalendarActionType.Delete, selectedDate.Value));
+            MessageBox.Show(selectDateErrorMessage, errorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            return false;
         }
-        else
+
+        return true;
+    }
+
+    private bool ValidateSelectedEventTitle()
+    {
+        if (SelectedEventTitle == null)
         {
-            MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(selectEventTitleErrorMessage, errorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            return false;
         }
+
+        return true;
     }
 }
