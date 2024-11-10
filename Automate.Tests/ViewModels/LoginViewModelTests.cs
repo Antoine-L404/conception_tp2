@@ -10,11 +10,11 @@ namespace Automate.Tests.ViewModels
     [TestClass]
     public class LoginViewModelTests
     {
-        private LoginViewModel loginViewModel;
-        private Mock<Window> mockWindow;
-        private Mock<IUserServices> mockUserService;
-        private Mock<IMongoDBServices> mongoDbServicesMock;
-        private Mock<PropertyChangedEventHandler> mockPropertyChanged;
+        private LoginViewModel? loginViewModel;
+        private Mock<Window>? mockWindow;
+        private Mock<IUserServices>? mockUserService;
+        private Mock<IMongoDBServices>? mongoDbServicesMock;
+        private Mock<PropertyChangedEventHandler>? mockPropertyChanged;
 
         private readonly User? NULL_USER = null;
 
