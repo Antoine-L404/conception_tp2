@@ -103,7 +103,7 @@ namespace Automate.ViewModels
             }
             else if(shouldNavigate)
             {
-                navigationUtils.NavigateToAndCloseCurrentWindow<AccueilWindow>(window);
+                navigationUtils.NavigateToAndCloseCurrentWindow<HomeWindow>(window);
                 Trace.WriteLine("logged in");
             }
         }
