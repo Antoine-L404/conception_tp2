@@ -7,7 +7,11 @@ namespace Automate.Views
         public CalendarWindow()
         {
             InitializeComponent();
-            DataContext = new CalendarViewModel(myCalendar);
+        }
+
+        private void Calendar_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = new CalendarViewModel(calendar);
         }
     }
 }

@@ -33,9 +33,9 @@ public class CalendarViewModel
 
     private readonly TaskCRUDService taskService;
 
-    public CalendarViewModel(Calendar myCalendar)
+    public CalendarViewModel(Calendar calendar)
     {
-        Calendar = myCalendar;
+        Calendar = calendar;
 
         var mongoDBService = new MongoDBServices(DBConstants.DB_NAME);
         taskService = new TaskCRUDService(mongoDBService);

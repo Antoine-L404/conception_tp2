@@ -7,9 +7,10 @@ xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
 
     <Grid>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Calendar x:Name="myCalendar" Margin="20" SelectionMode="SingleDate"
+            <Calendar x:Name="calendar" Margin="20" SelectionMode="SingleDate"
                       IsTodayHighlighted="True"
-                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}">
+                      SelectedDate="{Binding SelectedDate, Mode=TwoWay}" 
+                      Loaded="Calendar_Loaded">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedDatesChanged">
                         <behaviors:InvokeCommandAction Command="{Binding ClickOnDate}" />
