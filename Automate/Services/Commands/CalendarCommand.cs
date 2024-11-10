@@ -39,11 +39,6 @@ public class CalendarCommand
             MessageBox.Show(
                 $"Événement '{eventForm.taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
         }
-        else
-        {
-            MessageBox.Show("Veuillez sélectionner une date dans le calendrier.", "Erreur", 
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
     }
 
     public void EditTask(string taskTitle, DateTime taskDate)
