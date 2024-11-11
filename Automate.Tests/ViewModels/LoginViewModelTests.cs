@@ -13,7 +13,6 @@ namespace Automate.Tests.ViewModels
         private LoginViewModel? loginViewModel;
         private Mock<Window>? mockWindow;
         private Mock<IUserServices>? mockUserService;
-        private Mock<IMongoDBServices>? mongoDbServicesMock;
         private Mock<PropertyChangedEventHandler>? mockPropertyChanged;
 
         private readonly User? NULL_USER = null;
@@ -24,11 +23,10 @@ namespace Automate.Tests.ViewModels
             Thread thread = new Thread(() =>
             {
                 mockUserService = new Mock<IUserServices>();
-                mongoDbServicesMock = new Mock<IMongoDBServices>();
                 mockWindow = new Mock<Window>();
                 mockPropertyChanged = new Mock<PropertyChangedEventHandler>();
 
-                loginViewModel = new LoginViewModel(mockWindow.Object, mongoDbServicesMock.Object, mockUserService.Object, false);
+                loginViewModel = new LoginViewModel(mockWindow.Object, mockUserService.Object, false);
 
                 loginViewModel.PropertyChanged += mockPropertyChanged.Object;
             });

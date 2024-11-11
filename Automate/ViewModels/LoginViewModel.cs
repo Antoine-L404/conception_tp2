@@ -18,7 +18,6 @@ namespace Automate.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
-        private readonly IMongoDBServices mongoDBService;
         private readonly IUserServices userServices;
         private readonly NavigationUtils navigationUtils;
 
@@ -38,9 +37,8 @@ namespace Automate.ViewModels
         public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(Password));
         private readonly bool shouldNavigate;
 
-        public LoginViewModel(Window openedWindow, IMongoDBServices mongoDBServices, IUserServices userServices, bool shouldNavigate = true)
+        public LoginViewModel(Window openedWindow, IUserServices userServices, bool shouldNavigate = true)
         {
-            this.mongoDBService = mongoDBServices;
             this.userServices = userServices;
             this.shouldNavigate = shouldNavigate;
             AuthenticateCommand = new RelayCommand(Authenticate);

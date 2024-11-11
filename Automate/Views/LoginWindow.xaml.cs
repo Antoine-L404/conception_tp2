@@ -13,7 +13,7 @@ namespace Automate
         public LoginWindow()
         {
             InitializeComponent();
-            DataContext = new LoginViewModel(this, Environment.mongoService, Environment.userServices);
+            DataContext = new LoginViewModel(this, Environment.userServices);
         }
 
         //pas le choix d'utiliser un événement, on ne peut pas BIND un password pour des raisons de sécurité
