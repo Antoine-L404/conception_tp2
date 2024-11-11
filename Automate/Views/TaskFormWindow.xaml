@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Automate.Views"
         mc:Ignorable="d"
-        Title="TaskFormWindow" Height="340" Width="301">
+        Title="TaskFormWindow" Height="361" Width="301">
     <Grid Margin="20">
         <StackPanel>
             <TextBlock Text="Ajouter / Modifier Événement" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
@@ -20,6 +20,13 @@
                 <Button Content="Ajouter" Command="{Binding OnAddEventClick}" Width="75" Margin="5"/>
                 <Button Content="Annuler" Command="{Binding OnCancelEventClick}" Width="75" Margin="5"/>
             </StackPanel>
+            <TextBlock Foreground="#c50500" 
+               Text="{Binding ErrorMessages}"
+               Width="200" Height="50" 
+               Margin="10"
+               HorizontalAlignment="Left"
+               TextAlignment="Left"
+                TextWrapping="Wrap"/>
         </StackPanel>
     </Grid>
 </Window>
