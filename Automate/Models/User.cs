@@ -16,8 +16,9 @@ namespace Automate.Models
             get => username;
             set
             {
-                if (string.IsNullOrEmpty(value))
-                    throw new ArgumentException();
+                ArgumentNullException.ThrowIfNull(value);
+                if (value.Trim().Length == 0)
+                    throw new ArgumentException("Username length must not be empty");
 
                 username = value;
             }
@@ -29,8 +30,9 @@ namespace Automate.Models
             get => password;
             set
             {
-                if (string.IsNullOrEmpty(value))
-                    throw new ArgumentException();
+                ArgumentNullException.ThrowIfNull(value);
+                if (value.Trim().Length == 0)
+                    throw new ArgumentException("Password length must not be empty.");
 
                 password = value;
             }
@@ -43,8 +45,8 @@ namespace Automate.Models
             set
             {
                 ArgumentNullException.ThrowIfNull(value);
-                if (value != RoleConstant.ADMIN && value != RoleConstant.EMPLOYEE)
-                    throw new ArgumentException();
+                if (value != RoleConstants.ADMIN && value != RoleConstants.EMPLOYEE)
+                    throw new ArgumentException("Role value must be 'admin' or 'employee'.");
 
                 role = value;
             }

@@ -1,4 +1,5 @@
-﻿using Automate.Models;
+﻿using Automate.Abstract.Services;
+using Automate.Models;
 using Automate.Services;
 using Automate.Services.Commands;
 using Automate.Utils;
@@ -17,13 +18,13 @@ namespace Automate.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
-        private readonly MongoDBServices mongoService;
-        private readonly UserServices userServices;
+        private readonly IUserServices userServices;
         private readonly NavigationUtils navigationUtils;
 
         private string? username;
         private string? password;
-        
+
+
         private Window window;
 
         private ErrorsCollection errorsCollection;
@@ -34,11 +35,12 @@ namespace Automate.ViewModels
         public ICommand AuthenticateCommand { get; }
         public bool HasErrors => errorsCollection.ContainsAnyError();
         public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(Password));
+        private readonly bool shouldNavigate;
 
-        public LoginViewModel(Window openedWindow)
+        public LoginViewModel(Window openedWindow, IUserServices userServices, bool shouldNavigate = true)
         {
-            mongoService = new MongoDBServices(DBConstants.DB_NAME);
-            userServices = new UserServices(mongoService);
+            this.userServices = userServices;
+            this.shouldNavigate = shouldNavigate;
             AuthenticateCommand = new RelayCommand(Authenticate);
 
             navigationUtils = new NavigationUtils();
@@ -97,9 +99,9 @@ namespace Automate.ViewModels
                 NotifyErrorChange();
                 Trace.WriteLine("invalid");
             }
-            else
+            else if(shouldNavigate)
             {
-                navigationUtils.NavigateToAndCloseCurrentWindow<AccueilWindow>(window);
+                navigationUtils.NavigateToAndCloseCurrentWindow<HomeWindow>(window);
                 Trace.WriteLine("logged in");
             }
         }
