@@ -13,6 +13,8 @@ using System.Windows.Media;
 using Environment = Automate.Utils.Environment;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Automate.Utils.Enums;
+using Automate.Utils.Validation;
 
 public class CalendarViewModel : INotifyPropertyChanged
 {
@@ -22,15 +24,37 @@ public class CalendarViewModel : INotifyPropertyChanged
     private readonly string noEvenTitle = "Aucun événement";
 
     public CalendarCommand CalendarCommand { get; }
+    private ErrorsCollection errorsCollection;
     public ICommand OnAddEventClick { get; }
     public ICommand OnEditEventClick { get; }
     public ICommand OnDeleteEventClick { get; }
     public ICommand OnMonthChanged { get; }
     public ICommand ClickOnDate { get; }
+    public bool HasErrors => errorsCollection.ContainsAnyError();
+    public string ErrorMessages
+    {
+        get => errorsCollection.GetAllErrorMessages();
+    }
+    private EventType? selectedEventType;
+    public EventType? SelectedEventType
+    {
+        get => selectedEventType;
+        set
+        {
+            selectedEventType = value;
+
+            if (value != null)
+            {
+                errorsCollection.RemoveError(nameof(SelectedEventType));
+                NotifyErrorChange();
+            }
+        }
+    }
     public Calendar Calendar { get; set; }
     public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
     public DateTime? SelectedDate { get; set; }
 
     public string? SelectedEventTitle { get; set; }
@@ -54,6 +78,7 @@ public class CalendarViewModel : INotifyPropertyChanged
         IsAdmin = Environment.authenticatedUser.Role == RoleConstants.ADMIN;
 
         Calendar = calendar;
+        errorsCollection = new ErrorsCollection(ErrorsChanged);
 
         var mongoDBService = new MongoDBServices(DBConstants.DB_NAME);
         taskService = new TaskCRUDService(mongoDBService);
@@ -160,10 +185,17 @@ public class CalendarViewModel : INotifyPropertyChanged
     {
         if (SelectedDate == null)
         {
-            MessageBox.Show(selectDateErrorMessage, errorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            errorsCollection.AddError(nameof(SelectedEventType), selectDateErrorMessage);
+            NotifyErrorChange();
             return false;
         }
 
+        if(HasErrors)
+        {
+            errorsCollection.RemoveError(nameof(SelectedEventType));
+            NotifyErrorChange();
+        }
+        
         return true;
     }
 
@@ -171,10 +203,22 @@ public class CalendarViewModel : INotifyPropertyChanged
     {
         if (SelectedEventTitle == null)
         {
-            MessageBox.Show(selectEventTitleErrorMessage, errorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            errorsCollection.AddError(nameof(SelectedEventType), selectEventTitleErrorMessage);
+            NotifyErrorChange();
             return false;
         }
 
+        if (HasErrors)
+        {
+            errorsCollection.RemoveError(nameof(SelectedEventType));
+            NotifyErrorChange();
+        }
+
         return true;
+    }
+
+    private void NotifyErrorChange()
+    {
+        OnPropertyChanged(nameof(ErrorMessages));
     }
 }

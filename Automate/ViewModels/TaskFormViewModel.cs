@@ -55,13 +55,14 @@ namespace Automate.ViewModels
             OnAddEventClick = new RelayCommand(AddEvent);
             OnCancelEventClick = new RelayCommand(CancelEvent);
 
+            errorsCollection = new ErrorsCollection(ErrorsChanged);
+
             EventDate = selectedDate.ToShortDateString();
             EventTypes = Enum.GetValues(typeof(EventType)).Cast<EventType>();
 
             if (initialEventType.HasValue)
                 SelectedEventType = initialEventType.Value;
 
-            errorsCollection = new ErrorsCollection(ErrorsChanged);
 
             window = openedWindow;
         }

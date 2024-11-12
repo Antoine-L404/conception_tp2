@@ -35,6 +35,13 @@ xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
                     <Button Content="Ajouter un événement" IsEnabled="{Binding IsAdmin}" Command="{Binding OnAddEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0" Width="162"/>
                     <Button Content="Modifier l'événement" IsEnabled="{Binding IsAdmin}" Command="{Binding OnEditEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0" Width="161"/>
                     <Button Content="Supprimer l'événement" IsEnabled="{Binding IsAdmin}" Command="{Binding OnDeleteEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0"/>
+                    <TextBlock Foreground="#c50500" 
+                        Text="{Binding ErrorMessages}"
+                        Width="200" Height="50" 
+                        Margin="10"
+                        HorizontalAlignment="Left"
+                        TextAlignment="Left"
+                        TextWrapping="Wrap"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
