@@ -2,10 +2,11 @@
 using MongoDB.Bson;
 using System;
 using Automate.Utils.Constants;
+using Automate.Abstract.Models;
 
 namespace Automate.Models
 {
-    public class User
+    public class User : IObjectWithId
     {
         [BsonId]
         public ObjectId Id { get; set; }
