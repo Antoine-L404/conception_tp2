@@ -15,8 +15,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Automate.Utils.Enums;
 using Automate.Utils.Validation;
+using System.Collections;
 
-public class CalendarViewModel : INotifyPropertyChanged
+public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
     private readonly string selectDateErrorMessage = "Veuillez sélectionner une date dans le calendrier.";
     private readonly string selectEventTitleErrorMessage = "Veuillez sélectionner un événement à modifier.";
@@ -214,4 +215,6 @@ public class CalendarViewModel : INotifyPropertyChanged
     {
         OnPropertyChanged(nameof(ErrorMessages));
     }
+
+    public IEnumerable GetErrors(string? propertyName) => errorsCollection.GetErrors(propertyName);
 }
