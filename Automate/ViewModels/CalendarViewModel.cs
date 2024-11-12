@@ -63,20 +63,13 @@ public class CalendarViewModel : INotifyPropertyChanged
 
     public bool IsAdmin 
     {
-        get => isAdmin;
-        set 
-        {
-           isAdmin = value;
-           OnPropertyChanged(nameof(IsAdmin));
-        } 
+        get => Environment.authenticatedUser.Role == RoleConstants.ADMIN;
     }
 
     private readonly TaskCRUDService taskService;
 
     public CalendarViewModel(Calendar calendar)
     {
-        IsAdmin = Environment.authenticatedUser.Role == RoleConstants.ADMIN;
-
         Calendar = calendar;
         errorsCollection = new ErrorsCollection(ErrorsChanged);
 
