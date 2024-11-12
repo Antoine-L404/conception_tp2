@@ -1,5 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Automate.Abstract.Utils;
+using Automate.Utils.Enums;
+using Automate.ViewModels;
+using Automate.Views;
 
 namespace Automate.Utils
 {
@@ -20,6 +24,17 @@ namespace Automate.Utils
         public void Close(Window window)
         {
             window.Close();
+        }
+
+        public TaskFormViewModel? GetTaskFormValues(DateTime taskDate, EventType? initialEventType = null)
+        {
+            var taskForm = new TaskFormWindow(taskDate, initialEventType);
+            bool? result = taskForm.ShowDialog();
+
+            if (result != true)
+                return null;
+
+            return taskForm.taskFormViewModel;
         }
     }
 }

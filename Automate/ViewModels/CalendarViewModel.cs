@@ -15,25 +15,28 @@ using System.Runtime.CompilerServices;
 using Automate.Utils.Enums;
 using Automate.Utils.Validation;
 using System.Collections;
-using Automate.Views;
 using MongoDB.Driver;
 using Automate.Abstract.Services;
+using Automate.Abstract.Utils;
+using Automate.ViewModels;
 
 public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
     private readonly string selectDateErrorMessage = "Veuillez sélectionner une date dans le calendrier.";
-    private readonly string selectEventTitleErrorMessage = "Veuillez sélectionner un événement à modifier.";
+    private readonly string selectEventTitleErrorMessage = "Veuillez sélectionner un événement à modifier ou supprimer.";
     private readonly string noEvenTitle = "Aucun événement";
 
     private readonly ITasksServices tasksServices;
+    private readonly INavigationUtils navigationUtils;
 
     private ErrorsCollection errorsCollection;
+    private List<UpcomingTask> selectedDateTasks;
 
-    public ICommand OnAddEventClick { get; }
-    public ICommand OnEditEventClick { get; }
-    public ICommand OnDeleteEventClick { get; }
-    public ICommand OnMonthChanged { get; }
-    public ICommand ClickOnDate { get; }
+    public ICommand AddTaskCommand { get; }
+    public ICommand EditTaskCommand { get; }
+    public ICommand DeleteTaskCommand { get; }
+    public ICommand MonthChangedCommand { get; }
+    public ICommand DateSelectedCommand { get; }
 
     public bool HasErrors => errorsCollection.ContainsAnyError();
     public string ErrorMessages
@@ -54,18 +57,20 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         get => Environment.authenticatedUser.Role == RoleConstants.ADMIN;
     }
 
-    public CalendarViewModel(Calendar calendar, ITasksServices tasksServices)
+    public CalendarViewModel(Calendar calendar, ITasksServices tasksServices, INavigationUtils navigationUtils)
     {
         Calendar = calendar;
         this.tasksServices = tasksServices;
+        this.navigationUtils = navigationUtils;
 
         errorsCollection = new ErrorsCollection(ErrorsChanged);
+        selectedDateTasks = new List<UpcomingTask>();
 
-        OnAddEventClick = new RelayCommand(AddEvent);
-        OnEditEventClick = new RelayCommand(EditEvent);
-        OnDeleteEventClick = new RelayCommand(DeleteEvent);
-        ClickOnDate = new RelayCommand(ClickEvent);
-        OnMonthChanged = new RelayCommand(HighlightEventDates);
+        AddTaskCommand = new RelayCommand(AddTask);
+        EditTaskCommand = new RelayCommand(EditTask);
+        DeleteTaskCommand = new RelayCommand(DeleteTask);
+        DateSelectedCommand = new RelayCommand(DateSelected);
+        MonthChangedCommand = new RelayCommand(HighlightEventDates);
         
         HighlightEventDates();
         ShowTaskDetails(DateTime.Today);
@@ -76,38 +81,49 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private void ClickEvent()
+    private void NotifyErrorChange()
+    {
+        OnPropertyChanged(nameof(ErrorMessages));
+    }
+
+    public IEnumerable GetErrors(string? propertyName) => errorsCollection.GetErrors(propertyName);
+
+    public void DateSelected()
     {
         if (ValidateSelectedDate())
             ShowTaskDetails(SelectedDate!.Value);
     }
 
-    private void AddEvent()
+    public void AddTask()
     {
         if (!ValidateSelectedDate())
             return;
 
-        AddTask(SelectedDate!.Value);
+        HandleAddTaskForm(SelectedDate!.Value);
         HighlightEventDates();
         ShowTaskDetails(SelectedDate!.Value);
     }
 
-    private void EditEvent()
+    public void EditTask()
     {
-        if (!ValidateSelectedDate() || !ValidateSelectedEventTitle())
+        if (!ValidateSelectedDate() || 
+            !ValidateSelectedEventTitle() || 
+            !ValidateExistingTask(SelectedEventTitle!, SelectedDate!.Value))
             return;
 
-        EditTask(SelectedEventTitle!, SelectedDate!.Value);
+        HandleEditForm(SelectedEventTitle!, SelectedDate!.Value);
         HighlightEventDates();
         ShowTaskDetails(SelectedDate!.Value);
     }
 
-    private void DeleteEvent()
+    public void DeleteTask()
     {
-        if (!ValidateSelectedDate())
+        if (!ValidateSelectedDate() ||
+            !ValidateSelectedEventTitle() ||
+            !ValidateExistingTask(SelectedEventTitle!, SelectedDate!.Value))
             return;
 
-        DeleteTask(SelectedDate!.Value);
+        HandleDelete(SelectedEventTitle!, SelectedDate!.Value);
         HighlightEventDates();
         ShowTaskDetails(SelectedDate!.Value);
     }
@@ -120,10 +136,16 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         if (tasks.Count > 0)
         {
             foreach (var task in tasks)
+            {
                 EventTitles.Add(task.Title.ToString());
+                selectedDateTasks.Add(task);
+            }
         }
         else
+        {
             EventTitles.Add(noEvenTitle);
+            selectedDateTasks.Clear();
+        }
     }
 
     private void HighlightEventDates()
@@ -157,85 +179,57 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         return results;
     }
 
-    private void AddTask(DateTime taskDate)
+    private void HandleAddTaskForm(DateTime taskDate)
     {
-        var eventForm = new TaskFormWindow(taskDate);
-        var result = eventForm.ShowDialog();
-
-        if (result == true)
-        {
-            var newTask = new UpcomingTask
-            {
-                Title = (EventType)eventForm.taskFormViewModel.SelectedEventType!,
-                EventDate = taskDate
-            };
-
-            tasksServices.CreateTask(newTask);
-
-            MessageBox.Show(
-                $"Événement '{eventForm.taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
-        }
-    }
-
-    private void EditTask(string taskTitle, DateTime taskDate)
-    {
-        List<UpcomingTask> tasks = tasksServices.GetTasksByDate(taskDate);
-        UpcomingTask? existingTask = tasks.Find(task => task.EventDate.Date == taskDate && task.Title.ToString() == taskTitle);
-
-        if (existingTask != null)
-        {
-            HandleEditForm(existingTask, taskDate);
-        }
-        else
-        {
-            MessageBox.Show("Aucun événement à modifier pour cette date.", "Erreur",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-    }
-
-    private void HandleEditForm(UpcomingTask existingTask, DateTime taskDate)
-    {
-        var eventForm = new TaskFormWindow(taskDate, existingTask.Title);
-        var result = eventForm.ShowDialog();
-
-        if (result == true)
-        {
-            var updateDefinition = Builders<UpcomingTask>.Update
-                .Set(t => t.Title, eventForm.taskFormViewModel.SelectedEventType)
-                .Set(t => t.EventDate, taskDate);
-            tasksServices.UpdateTask(existingTask.Id, updateDefinition);
-
-            MessageBox.Show(
-                $"Événement '{eventForm.taskFormViewModel.SelectedEventType}' modifié pour le {taskDate.ToShortDateString()}");
-        }
-    }
-
-    public void DeleteTask(DateTime taskDate)
-    {
-        if (!AskForDeletion(taskDate))
+        TaskFormViewModel? taskFormViewModel = navigationUtils.GetTaskFormValues(taskDate);
+        if (taskFormViewModel == null)
             return;
 
-        List<UpcomingTask> tasks = tasksServices.GetTasksByDate(taskDate);
-        UpcomingTask? taskToDelete = tasks.Find(t => t.EventDate.Date == taskDate.Date);
-
-        if (taskToDelete != null)
+        var newTask = new UpcomingTask
         {
-            tasksServices.DeleteTask(taskToDelete.Id);
-            tasks.Remove(taskToDelete);
+            Title = (EventType)taskFormViewModel.SelectedEventType!,
+            EventDate = taskDate
+        };
 
-            MessageBox.Show("Événement supprimé avec succès.");
-        }
-        else
-        {
-            MessageBox.Show("Aucun événement trouvé à cette date.", "Erreur",
-                MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        tasksServices.CreateTask(newTask);
+
+        MessageBox.Show(
+            $"Événement '{taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
     }
 
-    private bool AskForDeletion(DateTime taskDate)
+    private void HandleEditForm(string taskTitle, DateTime taskDate)
+    {
+        UpcomingTask taskToEdit = selectedDateTasks.Find(task => task.Title.ToString() == taskTitle)!;
+
+        TaskFormViewModel? taskFormViewModel = navigationUtils.GetTaskFormValues(taskDate, taskToEdit.Title);
+        if (taskFormViewModel == null)
+            return;
+
+        var updateDefinition = Builders<UpcomingTask>.Update
+            .Set(t => t.Title, taskFormViewModel.SelectedEventType)
+            .Set(t => t.EventDate, taskDate);
+        tasksServices.UpdateTask(taskToEdit.Id, updateDefinition);
+
+        MessageBox.Show(
+            $"Événement '{taskFormViewModel.SelectedEventType}' modifié pour le {taskDate.ToShortDateString()}");
+    }
+
+    public void HandleDelete(string taskTitle, DateTime taskDate)
+    {
+        if (!AskForDeletion(taskTitle, taskDate))
+            return;
+
+        UpcomingTask taskToDelete = selectedDateTasks.Find(task => task.Title.ToString() == taskTitle)!;
+
+        tasksServices.DeleteTask(taskToDelete.Id);
+
+        MessageBox.Show("Événement supprimé avec succès.");
+    }
+
+    private bool AskForDeletion(string taskTitle, DateTime taskDate)
     {
         var result = MessageBox.Show(
-            $"Voulez-vous vraiment supprimer l'événement du {taskDate.ToShortDateString()} ?",
+            $"Voulez-vous vraiment supprimer l'événement {taskTitle} du {taskDate.ToShortDateString()} ?",
             "Confirmation de suppression", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
         return result == MessageBoxResult.Yes;
@@ -263,10 +257,21 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         );
     }
 
-    private void NotifyErrorChange()
+    private bool ValidateExistingTask(string taskTitle, DateTime taskDate)
     {
-        OnPropertyChanged(nameof(ErrorMessages));
-    }
+        UpcomingTask? existingTask = selectedDateTasks.Find(task => task.Title.ToString() == taskTitle);
 
-    public IEnumerable GetErrors(string? propertyName) => errorsCollection.GetErrors(propertyName);
+        if (existingTask == null)
+        {
+            errorsCollection.AddError(nameof(SelectedEventTitle), "Aucun événement existant à cette date.");
+            NotifyErrorChange();
+        }
+        else
+        {
+            errorsCollection.RemoveError(nameof(SelectedEventTitle));
+            NotifyErrorChange();
+        }
+        
+        return existingTask != null;
+    }
 }
