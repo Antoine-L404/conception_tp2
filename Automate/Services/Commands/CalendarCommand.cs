@@ -23,9 +23,9 @@ public class CalendarCommand
     public void AddTask(DateTime taskDate)
     {
         var eventForm = new TaskFormWindow(taskDate);
-        eventForm.ShowDialog();
+        var result = eventForm.ShowDialog();
 
-        if (eventForm.taskFormViewModel.IsConfirmed)
+        if (result == true)
         {
             var newTask = new UpcomingTask
             {
@@ -59,9 +59,9 @@ public class CalendarCommand
     private void HandleEditForm(UpcomingTask existingTask, DateTime taskDate)
     {
         var eventForm = new TaskFormWindow(taskDate, existingTask.Title);
-        eventForm.ShowDialog();
+        var result = eventForm.ShowDialog();
 
-        if (eventForm.taskFormViewModel.IsConfirmed)
+        if (result == true)
         {
             var updateDefinition = Builders<UpcomingTask>.Update
                 .Set(t => t.Title, eventForm.taskFormViewModel.SelectedEventType)

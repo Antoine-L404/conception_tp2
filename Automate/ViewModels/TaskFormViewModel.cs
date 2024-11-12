@@ -35,7 +35,6 @@ namespace Automate.ViewModels
                 }
             }
         }
-        public bool IsConfirmed { get; private set; }
 
         public ICommand OnAddEventClick { get; }
         public ICommand OnCancelEventClick { get; }
@@ -77,7 +76,7 @@ namespace Automate.ViewModels
         {
             if (SelectedEventType != null)
             {
-                IsConfirmed = true;
+                window.DialogResult = true;
                 window.Close();
             }
             else
@@ -89,7 +88,6 @@ namespace Automate.ViewModels
 
         private void CancelEvent()
         {
-            IsConfirmed = false;
             window.Close();
         }
 
