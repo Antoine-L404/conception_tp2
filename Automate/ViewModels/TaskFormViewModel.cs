@@ -1,4 +1,5 @@
-﻿using Automate.Services.Commands;
+﻿using Automate.Abstract.Utils;
+using Automate.Services.Commands;
 using Automate.Utils.Enums;
 using Automate.Utils.Validation;
 using System;
@@ -16,6 +17,7 @@ namespace Automate.ViewModels
     {
         private Window window;
         private ErrorsCollection errorsCollection;
+        private readonly INavigationUtils navigationUtils;
 
         public string EventDate { get; set; }
         public IEnumerable<EventType> EventTypes { get; set; }
@@ -49,10 +51,12 @@ namespace Automate.ViewModels
             get => errorsCollection.GetAllErrorMessages();
         }
 
-        public TaskFormViewModel(Window openedWindow, DateTime selectedDate, EventType? initialEventType = null) 
+        public TaskFormViewModel(Window openedWindow, DateTime selectedDate, INavigationUtils navigationUtils, EventType? initialEventType = null)
         {
             OnAddEventClick = new RelayCommand(AddEvent);
             OnCancelEventClick = new RelayCommand(CancelEvent);
+
+            this.navigationUtils = navigationUtils;
 
             errorsCollection = new ErrorsCollection(ErrorsChanged);
 
@@ -77,7 +81,7 @@ namespace Automate.ViewModels
             if (SelectedEventType != null)
             {
                 window.DialogResult = true;
-                window.Close();
+                navigationUtils.Close(window);
             }
             else
             {
@@ -88,7 +92,7 @@ namespace Automate.ViewModels
 
         private void CancelEvent()
         {
-            window.Close();
+            navigationUtils.Close(window);
         }
 
         private void NotifyErrorChange()
