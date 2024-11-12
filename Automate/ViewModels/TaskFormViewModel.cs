@@ -63,7 +63,6 @@ namespace Automate.ViewModels
             if (initialEventType.HasValue)
                 SelectedEventType = initialEventType.Value;
 
-
             window = openedWindow;
         }
 
