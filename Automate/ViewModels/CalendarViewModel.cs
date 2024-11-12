@@ -10,8 +10,11 @@ using System.Collections.Generic;
 using Automate.Models;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using Environment = Automate.Utils.Environment;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-public class CalendarViewModel
+public class CalendarViewModel : INotifyPropertyChanged
 {
     private readonly string selectDateErrorMessage = "Veuillez sélectionner une date dans le calendrier.";
     private readonly string selectEventTitleErrorMessage = "Veuillez sélectionner un événement à modifier.";
@@ -27,14 +30,29 @@ public class CalendarViewModel
     public Calendar Calendar { get; set; }
     public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
 
+    public event PropertyChangedEventHandler? PropertyChanged;
     public DateTime? SelectedDate { get; set; }
 
     public string? SelectedEventTitle { get; set; }
+
+    private bool isAdmin;
+
+    public bool IsAdmin 
+    {
+        get => isAdmin;
+        set 
+        {
+           isAdmin = value;
+           OnPropertyChanged(nameof(IsAdmin));
+        } 
+    }
 
     private readonly TaskCRUDService taskService;
 
     public CalendarViewModel(Calendar calendar)
     {
+        IsAdmin = Environment.authenticatedUser.Role == RoleConstants.ADMIN;
+
         Calendar = calendar;
 
         var mongoDBService = new MongoDBServices(DBConstants.DB_NAME);
@@ -50,6 +68,11 @@ public class CalendarViewModel
         
         HighlightEventDates();
         ShowTaskDetails(DateTime.Today);
+    }
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     private void ClickEvent()
