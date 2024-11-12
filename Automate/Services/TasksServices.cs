@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Automate.Services
 {
-    public class TasksServices
+    public class TasksServices : ITasksServices
     {
         private readonly IMongoDBServices mongoDBService;
         private readonly IMongoCollection<UpcomingTask> tasks;
