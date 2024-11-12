@@ -60,8 +60,6 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
     public string? SelectedEventTitle { get; set; }
 
-    private bool isAdmin;
-
     public bool IsAdmin 
     {
         get => Environment.authenticatedUser.Role == RoleConstants.ADMIN;
@@ -177,38 +175,24 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
     private bool ValidateSelectedDate()
     {
-        if (SelectedDate == null)
-        {
-            errorsCollection.AddError(nameof(SelectedEventType), selectDateErrorMessage);
-            NotifyErrorChange();
-            return false;
-        }
-
-        if(HasErrors)
-        {
-            errorsCollection.RemoveError(nameof(SelectedEventType));
-            NotifyErrorChange();
-        }
-        
-        return true;
+        return CommonValidation.ValidateNull(
+            nameof(SelectedEventType),
+            SelectedDate,
+            selectDateErrorMessage,
+            errorsCollection,
+            NotifyErrorChange
+        );
     }
 
     private bool ValidateSelectedEventTitle()
     {
-        if (SelectedEventTitle == null)
-        {
-            errorsCollection.AddError(nameof(SelectedEventType), selectEventTitleErrorMessage);
-            NotifyErrorChange();
-            return false;
-        }
-
-        if (HasErrors)
-        {
-            errorsCollection.RemoveError(nameof(SelectedEventType));
-            NotifyErrorChange();
-        }
-
-        return true;
+        return CommonValidation.ValidateNull(
+            nameof(SelectedEventType),
+            SelectedEventType,
+            selectEventTitleErrorMessage,
+            errorsCollection,
+            NotifyErrorChange
+        );
     }
 
     private void NotifyErrorChange()

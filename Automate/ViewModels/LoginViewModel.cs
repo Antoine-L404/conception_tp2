@@ -112,7 +112,7 @@ namespace Automate.ViewModels
 
         private void ValidateUsername()
         {
-            CommonValidation.ValidateNullOrEmpty(
+            CommonValidation.ValidateStringNullOrEmpty(
                 nameof(Username), 
                 Username, 
                 "Le nom d'utilisateur ne peut pas être vide.", 
@@ -122,7 +122,7 @@ namespace Automate.ViewModels
 
         private void ValidatePassword()
         {
-            CommonValidation.ValidateNullOrEmpty(
+            CommonValidation.ValidateStringNullOrEmpty(
                 nameof(Password), 
                 Password,
                 "Le mot de passe ne peut pas être vide.", 
