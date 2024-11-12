@@ -1,8 +1,9 @@
 ﻿using System.Windows;
+using Automate.Abstract.Utils;
 
 namespace Automate.Utils
 {
-    public class NavigationUtils
+    public class NavigationUtils : INavigationUtils
     {
         public void NavigateTo<T>() where T : Window, new()
         {
@@ -21,5 +22,4 @@ namespace Automate.Utils
             window.Close();
         }
     }
-
 }
