@@ -1,10 +1,8 @@
-﻿using Automate.Abstract.Utils;
-using Automate.Utils;
+﻿using Automate.Utils;
 using Automate.Utils.Enums;
 using Automate.ViewModels;
 using Moq;
 using System.ComponentModel;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 
 namespace Automate.Tests.ViewModels
@@ -52,7 +50,5 @@ namespace Automate.Tests.ViewModels
 
             Assert.Equals(eventdate, taskFormViewModel.EventDate);
         }
-
-        public void  
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Automate.Abstract.Services;
 using Automate.Abstract.Utils;
-using Automate.ViewModels;
 using Moq;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace Automate.Tests.ViewModels
@@ -10,9 +8,10 @@ namespace Automate.Tests.ViewModels
     [TestClass]
     public class CalendarViewModelTests
     {
-        private CalendarViewModel calendarViewModel;
-        private Mock<ITasksServices> tasksServicesMock;
-        private Mock<Calendar> calendarMock;
+        private CalendarViewModel? calendarViewModel;
+        private Mock<ITasksServices>? tasksServicesMock;
+        private Mock<Calendar>? calendarMock;
+        private Mock<INavigationUtils>? navigationUtilsMock;
 
         [TestInitialize]
         public void TestInitialize()
@@ -21,7 +20,10 @@ namespace Automate.Tests.ViewModels
             {
                 tasksServicesMock = new Mock<ITasksServices>();
                 calendarMock = new Mock<Calendar>();
-                calendarViewModel = new CalendarViewModel(calendarMock.Object, tasksServicesMock.Object);
+                navigationUtilsMock = new Mock<INavigationUtils>();
+
+                calendarViewModel = new CalendarViewModel(
+                    calendarMock.Object, tasksServicesMock.Object, navigationUtilsMock.Object);
             });
 
             thread.SetApartmentState(ApartmentState.STA);
