@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Environment = Automate.Utils.Environment;
 
 namespace Automate.ViewModels
 {
@@ -97,6 +98,7 @@ namespace Automate.ViewModels
             }
             else
             {
+                Environment.authenticatedUser = user;
                 navigationUtils.NavigateToAndCloseCurrentWindow<HomeWindow>(window);
                 Trace.WriteLine("logged in");
             }
