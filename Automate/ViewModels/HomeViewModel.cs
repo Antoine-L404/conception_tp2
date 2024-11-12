@@ -14,14 +14,14 @@ namespace Automate.ViewModels
 
         public HomeViewModel(Window openedWindow)
         {
-            this.navigationUtils = new NavigationUtils();
-            this.window = openedWindow;
-            this.GoToCalendarCommand = new RelayCommand(GoToCalendar);
+            navigationUtils = new NavigationUtils();
+            window = openedWindow;
+            GoToCalendarCommand = new RelayCommand(GoToCalendar);
         }
 
         public void GoToCalendar()
         {
-            navigationUtils.NavigateToAndCloseCurrentWindow<HomeWindow>(window); //should navigate to calendar, change when it's merged
+            navigationUtils.NavigateToAndCloseCurrentWindow<CalendarWindow>(window);
         }
     }
 }

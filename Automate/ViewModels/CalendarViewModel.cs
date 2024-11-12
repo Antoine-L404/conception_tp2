@@ -10,8 +10,14 @@ using System.Collections.Generic;
 using Automate.Models;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using Environment = Automate.Utils.Environment;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Automate.Utils.Enums;
+using Automate.Utils.Validation;
+using System.Collections;
 
-public class CalendarViewModel
+public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
     private readonly string selectDateErrorMessage = "Veuillez sélectionner une date dans le calendrier.";
     private readonly string selectEventTitleErrorMessage = "Veuillez sélectionner un événement à modifier.";
@@ -19,23 +25,54 @@ public class CalendarViewModel
     private readonly string noEvenTitle = "Aucun événement";
 
     public CalendarCommand CalendarCommand { get; }
+    private ErrorsCollection errorsCollection;
     public ICommand OnAddEventClick { get; }
     public ICommand OnEditEventClick { get; }
     public ICommand OnDeleteEventClick { get; }
     public ICommand OnMonthChanged { get; }
     public ICommand ClickOnDate { get; }
+    public bool HasErrors => errorsCollection.ContainsAnyError();
+    public string ErrorMessages
+    {
+        get => errorsCollection.GetAllErrorMessages();
+    }
+    private EventType? selectedEventType;
+    public EventType? SelectedEventType
+    {
+        get => selectedEventType;
+        set
+        {
+            selectedEventType = value;
+
+            if (value != null)
+            {
+                errorsCollection.RemoveError(nameof(SelectedEventType));
+                NotifyErrorChange();
+            }
+        }
+    }
     public Calendar Calendar { get; set; }
     public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
     public DateTime? SelectedDate { get; set; }
 
     public string? SelectedEventTitle { get; set; }
+
+    private bool isAdmin;
+
+    public bool IsAdmin 
+    {
+        get => Environment.authenticatedUser.Role == RoleConstants.ADMIN;
+    }
 
     private readonly TaskCRUDService taskService;
 
     public CalendarViewModel(Calendar calendar)
     {
         Calendar = calendar;
+        errorsCollection = new ErrorsCollection(ErrorsChanged);
 
         var mongoDBService = new MongoDBServices(DBConstants.DB_NAME);
         taskService = new TaskCRUDService(mongoDBService);
@@ -50,6 +87,11 @@ public class CalendarViewModel
         
         HighlightEventDates();
         ShowTaskDetails(DateTime.Today);
+    }
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     private void ClickEvent()
@@ -137,10 +179,17 @@ public class CalendarViewModel
     {
         if (SelectedDate == null)
         {
-            MessageBox.Show(selectDateErrorMessage, errorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            errorsCollection.AddError(nameof(SelectedEventType), selectDateErrorMessage);
+            NotifyErrorChange();
             return false;
         }
 
+        if(HasErrors)
+        {
+            errorsCollection.RemoveError(nameof(SelectedEventType));
+            NotifyErrorChange();
+        }
+        
         return true;
     }
 
@@ -148,10 +197,24 @@ public class CalendarViewModel
     {
         if (SelectedEventTitle == null)
         {
-            MessageBox.Show(selectEventTitleErrorMessage, errorTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            errorsCollection.AddError(nameof(SelectedEventType), selectEventTitleErrorMessage);
+            NotifyErrorChange();
             return false;
+        }
+
+        if (HasErrors)
+        {
+            errorsCollection.RemoveError(nameof(SelectedEventType));
+            NotifyErrorChange();
         }
 
         return true;
     }
+
+    private void NotifyErrorChange()
+    {
+        OnPropertyChanged(nameof(ErrorMessages));
+    }
+
+    public IEnumerable GetErrors(string? propertyName) => errorsCollection.GetErrors(propertyName);
 }

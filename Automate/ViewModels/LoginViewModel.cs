@@ -1,9 +1,7 @@
 ﻿using Automate.Abstract.Services;
 using Automate.Models;
-using Automate.Services;
 using Automate.Services.Commands;
 using Automate.Utils;
-using Automate.Utils.Constants;
 using Automate.Utils.Validation;
 using Automate.Views;
 using System;
@@ -13,6 +11,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Environment = Automate.Utils.Environment;
 
 namespace Automate.ViewModels
 {
@@ -101,6 +100,7 @@ namespace Automate.ViewModels
             }
             else if(shouldNavigate)
             {
+                Environment.authenticatedUser = user;
                 navigationUtils.NavigateToAndCloseCurrentWindow<HomeWindow>(window);
                 Trace.WriteLine("logged in");
             }
