@@ -8,11 +8,11 @@ using System.Linq;
 
 namespace Automate.Services
 {
-    public class TaskCRUDService
+    public class TasksServices
     {
         private readonly IMongoCollection<UpcomingTask> tasks;
 
-        public TaskCRUDService(MongoDBServices mongoDBService)
+        public TasksServices(MongoDBServices mongoDBService)
         {
             tasks = mongoDBService.GetCollection<UpcomingTask>(DBConstants.TASKS_COLLECTION_NAME);
         }

@@ -12,9 +12,9 @@ public class CalendarCommand
 {
     private readonly List<UpcomingTask> tasks;
 
-    private readonly TaskCRUDService taskService;
+    private readonly TasksServices taskService;
 
-    public CalendarCommand(TaskCRUDService taskService)
+    public CalendarCommand(TasksServices taskService)
     {
         this.taskService = taskService;
         tasks = taskService.GetAllTasks();

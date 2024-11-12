@@ -67,7 +67,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         get => Environment.authenticatedUser.Role == RoleConstants.ADMIN;
     }
 
-    private readonly TaskCRUDService taskService;
+    private readonly TasksServices taskService;
 
     public CalendarViewModel(Calendar calendar)
     {
@@ -75,7 +75,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         errorsCollection = new ErrorsCollection(ErrorsChanged);
 
         var mongoDBService = new MongoDBServices(DBConstants.DB_NAME);
-        taskService = new TaskCRUDService(mongoDBService);
+        taskService = new TasksServices(mongoDBService);
 
         CalendarCommand = new CalendarCommand(taskService);
 
