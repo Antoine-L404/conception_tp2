@@ -53,7 +53,7 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void SetEventType_WhenErrorCollectionHasErrors_And_NewValueIsValid_RemoveErrors()
+        public void SetEventType_WhenErrorCollectionHasErrors_And_NewValueIsValid_RemovesErrors()
         {
             taskFormViewModel!.AddEvent();
 
