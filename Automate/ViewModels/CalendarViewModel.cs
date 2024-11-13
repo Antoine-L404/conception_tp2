@@ -44,6 +44,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         get => errorsCollection.GetAllErrorMessages();
     }
+    public string SuccessMessage { get; set; }
 
     public DateTime? SelectedDate { get; set; }
     public string? SelectedEventTitle { get; set; }
@@ -85,6 +86,15 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     private void NotifyErrorChange()
     {
         OnPropertyChanged(nameof(ErrorMessages));
+
+        SuccessMessage = string.Empty;
+        OnPropertyChanged(nameof(SuccessMessage));
+    }
+
+    private void NotifySuccessMessageChange(string message)
+    {
+        SuccessMessage = message;
+        OnPropertyChanged(nameof(SuccessMessage));
     }
 
     public IEnumerable GetErrors(string? propertyName) => errorsCollection.GetErrors(propertyName);
@@ -109,7 +119,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         if (!ValidateSelectedDate() || 
             !ValidateSelectedEventTitle() || 
-            !ValidateExistingTask(SelectedEventTitle!, SelectedDate!.Value))
+            !ValidateExistingTask(SelectedEventTitle!))
             return;
 
         HandleEditForm(SelectedEventTitle!, SelectedDate!.Value);
@@ -121,7 +131,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         if (!ValidateSelectedDate() ||
             !ValidateSelectedEventTitle() ||
-            !ValidateExistingTask(SelectedEventTitle!, SelectedDate!.Value))
+            !ValidateExistingTask(SelectedEventTitle!))
             return;
 
         HandleDelete(SelectedEventTitle!);
@@ -194,8 +204,8 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
         tasksServices.CreateTask(newTask);
 
-        //MessageBox.Show(
-        //    $"Événement '{taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
+        NotifySuccessMessageChange(
+            $"Événement '{taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
     }
 
     private void HandleEditForm(string taskTitle, DateTime taskDate)
@@ -211,8 +221,8 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
             .Set(t => t.EventDate, taskDate);
         tasksServices.UpdateTask(taskToEdit.Id, updateDefinition);
 
-        //MessageBox.Show(
-        //    $"Événement '{taskFormViewModel.SelectedEventType}' modifié pour le {taskDate.ToShortDateString()}");
+        NotifySuccessMessageChange(
+            $"Événement '{taskFormViewModel.SelectedEventType}' modifié pour le {taskDate.ToShortDateString()}");
     }
 
     public void HandleDelete(string taskTitle)
@@ -221,7 +231,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
         tasksServices.DeleteTask(taskToDelete.Id);
 
-        //MessageBox.Show("Événement supprimé avec succès.");
+        NotifySuccessMessageChange($"Événement '{taskToDelete.Title}' supprimé avec succès");
     }
 
     private bool ValidateSelectedDate()
@@ -246,7 +256,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         );
     }
 
-    private bool ValidateExistingTask(string taskTitle, DateTime taskDate)
+    private bool ValidateExistingTask(string taskTitle)
     {
         UpcomingTask? existingTask = selectedDateTasks.Find(task => task.Title.ToString() == taskTitle);
 
