@@ -19,6 +19,7 @@ using MongoDB.Driver;
 using Automate.Abstract.Services;
 using Automate.Abstract.Utils;
 using Automate.ViewModels;
+using Automate.Abstract.ViewModels;
 
 public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
@@ -181,7 +182,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
     private void HandleAddTaskForm(DateTime taskDate)
     {
-        TaskFormViewModel? taskFormViewModel = navigationUtils.GetTaskFormValues(taskDate);
+        ITaskFormViewModel? taskFormViewModel = navigationUtils.GetTaskFormValues(taskDate);
         if (taskFormViewModel == null)
             return;
 
@@ -201,7 +202,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         UpcomingTask taskToEdit = selectedDateTasks.Find(task => task.Title.ToString() == taskTitle)!;
 
-        TaskFormViewModel? taskFormViewModel = navigationUtils.GetTaskFormValues(taskDate, taskToEdit.Title);
+        ITaskFormViewModel? taskFormViewModel = navigationUtils.GetTaskFormValues(taskDate, taskToEdit.Title);
         if (taskFormViewModel == null)
             return;
 

@@ -1,4 +1,5 @@
 ﻿using Automate.Abstract.Utils;
+using Automate.Abstract.ViewModels;
 using Automate.Services.Commands;
 using Automate.Utils.Enums;
 using Automate.Utils.Validation;
@@ -13,7 +14,7 @@ using System.Windows.Input;
 
 namespace Automate.ViewModels
 {
-    public class TaskFormViewModel: INotifyPropertyChanged, INotifyDataErrorInfo
+    public class TaskFormViewModel : INotifyPropertyChanged, INotifyDataErrorInfo, ITaskFormViewModel
     {
         private Window window;
         private ErrorsCollection errorsCollection;
@@ -23,9 +24,9 @@ namespace Automate.ViewModels
         public IEnumerable<EventType> EventTypes { get; set; }
 
         private EventType? selectedEventType;
-        public EventType? SelectedEventType 
-        { 
-            get => selectedEventType; 
+        public EventType? SelectedEventType
+        {
+            get => selectedEventType;
             set
             {
                 selectedEventType = value;

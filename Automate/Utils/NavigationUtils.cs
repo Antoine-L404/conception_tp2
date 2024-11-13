@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows;
 using Automate.Abstract.Utils;
+using Automate.Abstract.ViewModels;
 using Automate.Utils.Enums;
-using Automate.ViewModels;
 using Automate.Views;
 
 namespace Automate.Utils
@@ -26,7 +26,7 @@ namespace Automate.Utils
             window.Close();
         }
 
-        public TaskFormViewModel? GetTaskFormValues(DateTime taskDate, EventType? initialEventType = null)
+        public ITaskFormViewModel? GetTaskFormValues(DateTime taskDate, EventType? initialEventType = null)
         {
             var taskForm = new TaskFormWindow(taskDate, initialEventType);
             bool? result = taskForm.ShowDialog();
