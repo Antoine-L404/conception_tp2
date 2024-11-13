@@ -34,7 +34,7 @@ namespace Automate.ViewModels
                 if (value != null)
                 {
                     errorsCollection.RemoveError(nameof(SelectedEventType));
-                    NotifyErrorChange();
+                    OnPropertyChanged(nameof(ErrorMessages));
                 }
             }
         }
@@ -46,7 +46,6 @@ namespace Automate.ViewModels
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         public bool HasErrors => errorsCollection.ContainsAnyError();
-        public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(SelectedEventType));
         public string ErrorMessages
         {
             get => errorsCollection.GetAllErrorMessages();
@@ -87,19 +86,13 @@ namespace Automate.ViewModels
             else
             {
                 errorsCollection.AddError(nameof(SelectedEventType), "Veuillez sélectionner un type d'événement");
-                NotifyErrorChange();
+                OnPropertyChanged(nameof(ErrorMessages));
             }
         }
 
         public void Cancel()
         {
             navigationUtils.Close(window);
-        }
-
-        private void NotifyErrorChange()
-        {
-            OnPropertyChanged(nameof(ErrorMessages));
-            OnPropertyChanged(nameof(HasPasswordErrors));
         }
     }
 }

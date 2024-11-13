@@ -15,7 +15,6 @@ namespace Automate.Abstract.ViewModels
         string EventDate { get; set; }
         IEnumerable<EventType> EventTypes { get; set; }
         bool HasErrors { get; }
-        bool HasPasswordErrors { get; }
         EventType? SelectedEventType { get; set; }
 
         event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;

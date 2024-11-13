@@ -3,12 +3,10 @@ using Automate.Abstract.Utils;
 using Automate.Abstract.ViewModels;
 using Automate.Models;
 using Automate.Utils.Enums;
-using Automate.ViewModels;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;
-using System.Windows;
-using System.Windows.Controls;
+using System.ComponentModel;
 
 namespace Automate.Tests.ViewModels
 {
@@ -19,10 +17,9 @@ namespace Automate.Tests.ViewModels
 
         private CalendarViewModel? calendarViewModel;
         private Mock<ITasksServices>? tasksServicesMock;
-        private Mock<Calendar>? calendarMock;
         private Mock<INavigationUtils>? navigationUtilsMock;
-        private Mock<Window>? windowMock;
         private Mock<ITaskFormViewModel>? taskFormViewModelMock;
+        private Mock<PropertyChangedEventHandler>? propertyChangedMock;
 
         [TestInitialize]
         public void TestInitialize()
@@ -32,13 +29,14 @@ namespace Automate.Tests.ViewModels
                 tasksServicesMock = new Mock<ITasksServices>();
                 tasksServicesMock.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>())).Returns(new List<UpcomingTask>());
 
-                calendarMock = new Mock<Calendar>();
                 navigationUtilsMock = new Mock<INavigationUtils>();
-                windowMock = new Mock<Window>();
                 taskFormViewModelMock = new Mock<ITaskFormViewModel>();
+                propertyChangedMock = new Mock<PropertyChangedEventHandler>();
 
                 calendarViewModel = new CalendarViewModel(
-                    null, tasksServicesMock.Object, navigationUtilsMock.Object);
+                    null!, tasksServicesMock.Object, navigationUtilsMock.Object);
+
+                calendarViewModel.PropertyChanged += propertyChangedMock.Object;
             });
 
             thread.SetApartmentState(ApartmentState.STA);
@@ -52,6 +50,19 @@ namespace Automate.Tests.ViewModels
             calendarViewModel!.DateSelected();
 
             Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void DateSelected_SelectedDateInvalid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "ErrorMessages";
+
+            calendarViewModel!.DateSelected();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.Once()
+            );
         }
 
         [TestMethod]
@@ -132,6 +143,19 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
+        public void AddTask_SelectedDateInvalid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "ErrorMessages";
+
+            calendarViewModel!.AddTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.Once()
+            );
+        }
+
+        [TestMethod]
         public void AddTask_SelectedDateIsValid_CallTasksServices()
         {
             SetupForValidAddTask();
@@ -164,6 +188,20 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
+        public void AddTask_SelectedDateValid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "SuccessMessage";
+            SetupForValidAddTask();
+
+            calendarViewModel!.AddTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.AtLeastOnce()
+            );
+        }
+
+        [TestMethod]
         public void EditTask_SelectedDateInvalid_AddErrorToErrorsCollection()
         {
             calendarViewModel!.EditTask();
@@ -172,11 +210,40 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void EditTask_SelectedEventTitleInvalid_AddErrorToErrorsCollection()
+        public void EditTask_SelectedDateInvalid_OnPropertyChangedIsInvoked()
         {
+            const string argPropertyName = "ErrorMessages";
+
             calendarViewModel!.EditTask();
 
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.Once()
+            );
+        }
+
+        [TestMethod]
+        public void EditTask_SelectedEventTitleInvalid_AddErrorToErrorsCollection()
+        {
+            calendarViewModel!.SelectedDate = DateTime.Today;
+
+            calendarViewModel.EditTask();
+
             Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void EditTask_SelectedEventTitleInvalid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "ErrorMessages";
+            calendarViewModel!.SelectedDate = DateTime.Today;
+
+            calendarViewModel.EditTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.AtLeastOnce()
+            );
         }
 
         [TestMethod]
@@ -188,6 +255,21 @@ namespace Automate.Tests.ViewModels
             calendarViewModel.EditTask();
 
             Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void EditTask_TaskToEditInvalid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "ErrorMessages";
+            calendarViewModel!.SelectedDate = DateTime.Today;
+            calendarViewModel.SelectedEventTitle = EventType.Entretien.ToString();
+
+            calendarViewModel.EditTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.AtLeastOnce()
+            );
         }
 
         [TestMethod]
@@ -234,6 +316,20 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
+        public void EditTask_SelectedDateValid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "SuccessMessage";
+            SetupForValidEditTask();
+
+            calendarViewModel!.EditTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.AtLeastOnce()
+            );
+        }
+
+        [TestMethod]
         public void DeleteTask_SelectedDateInvalid_AddErrorToErrorsCollection()
         {
             calendarViewModel!.DeleteTask();
@@ -242,15 +338,44 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
+        public void DeleteTask_SelectedDateInvalid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "ErrorMessages";
+
+            calendarViewModel!.DeleteTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.Once()
+            );
+        }
+
+        [TestMethod]
         public void DeleteTask_SelectedEventTitleInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.DeleteTask();
+            calendarViewModel!.SelectedDate = DateTime.Today;
+
+            calendarViewModel.DeleteTask();
 
             Assert.IsTrue(calendarViewModel!.HasErrors);
         }
 
         [TestMethod]
-        public void DeleteTask_TaskToEditInvalid_AddErrorToErrorsCollection()
+        public void DeleteTask_SelectedEventTitleInvalid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "ErrorMessages";
+            calendarViewModel!.SelectedDate = DateTime.Today;
+
+            calendarViewModel.DeleteTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.AtLeastOnce()
+            );
+        }
+
+        [TestMethod]
+        public void DeleteTask_TaskToDeleteInvalid_AddErrorToErrorsCollection()
         {
             calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
             calendarViewModel.SelectedDate = DateTime.Today;
@@ -258,6 +383,21 @@ namespace Automate.Tests.ViewModels
             calendarViewModel.DeleteTask();
 
             Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void DeleteTask_TaskToDeleteInvalid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "ErrorMessages";
+            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedDate = DateTime.Today;
+
+            calendarViewModel.DeleteTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.AtLeastOnce()
+            );
         }
 
         [TestMethod]
@@ -278,6 +418,20 @@ namespace Automate.Tests.ViewModels
             calendarViewModel!.DeleteTask();
 
             tasksServicesMock!.Verify(x => x.DeleteTask(It.IsAny<ObjectId>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void DeleteTask_SelectedDateValid_OnPropertyChangedIsInvoked()
+        {
+            const string argPropertyName = "SuccessMessage";
+            SetupForValidDeleteTask();
+
+            calendarViewModel!.DeleteTask();
+
+            propertyChangedMock!.Verify(x =>
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
+                Times.AtLeastOnce()
+            );
         }
 
         private void SetupForValidDateSelectedOneTask()

@@ -44,7 +44,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         get => errorsCollection.GetAllErrorMessages();
     }
-    public string SuccessMessage { get; set; }
+    public string? SuccessMessage { get; set; }
 
     public DateTime? SelectedDate { get; set; }
     public string? SelectedEventTitle { get; set; }
