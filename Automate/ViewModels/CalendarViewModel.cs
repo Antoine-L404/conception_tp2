@@ -129,7 +129,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         ShowTaskDetails(SelectedDate!.Value);
     }
 
-    public void ShowTaskDetails(DateTime selectedDate)
+    private void ShowTaskDetails(DateTime selectedDate)
     {
         EventTitles.Clear();
         List<UpcomingTask> tasks = tasksServices.GetTasksByDate(selectedDate);

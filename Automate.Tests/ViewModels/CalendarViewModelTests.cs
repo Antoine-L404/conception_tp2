@@ -4,6 +4,8 @@ using Automate.Abstract.ViewModels;
 using Automate.Models;
 using Automate.Utils.Enums;
 using Automate.ViewModels;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using Moq;
 using System.Windows;
 using System.Windows.Controls;
@@ -79,13 +81,9 @@ namespace Automate.Tests.ViewModels
         public void DateSelected_SelectedDateContainsOneTask_EventTitlesCountIsOne()
         {
             const int expectedCount = 1;
-            UpcomingTask returnedTask = new UpcomingTask() { Title = EventType.Semis };
+            SetupForValidDateSelectedOneTask();
 
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
-                .Returns(new List<UpcomingTask>() { returnedTask });
-
-            calendarViewModel.DateSelected();
+            calendarViewModel!.DateSelected();
 
             Assert.AreEqual(expectedCount, calendarViewModel.EventTitles.Count);
         }
@@ -94,13 +92,9 @@ namespace Automate.Tests.ViewModels
         public void DateSelected_SelectedDateContainsOneTask_EventTitlesValueIsCorrect()
         {
             string expectedValue = EventType.Semis.ToString();
-            UpcomingTask returnedTask = new UpcomingTask() { Title = EventType.Semis };
+            SetupForValidDateSelectedOneTask();
 
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
-                .Returns(new List<UpcomingTask>() { returnedTask });
-
-            calendarViewModel.DateSelected();
+            calendarViewModel!.DateSelected();
 
             Assert.AreEqual(expectedValue, calendarViewModel.EventTitles[0]);
         }
@@ -109,14 +103,9 @@ namespace Automate.Tests.ViewModels
         public void DateSelected_SelectedDateContainsManyTasks_EventTitlesCountIsCorrect()
         {
             const int expectedCount = 2;
-            UpcomingTask returnedTask1 = new UpcomingTask() { Title = EventType.Semis };
-            UpcomingTask returnedTask2 = new UpcomingTask() { Title = EventType.Entretien };
+            SetupForValidDateSelectedManyTasks();
 
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
-                .Returns(new List<UpcomingTask>() { returnedTask1, returnedTask2 });
-
-            calendarViewModel.DateSelected();
+            calendarViewModel!.DateSelected();
 
             Assert.AreEqual(expectedCount, calendarViewModel.EventTitles.Count);
         }
@@ -124,17 +113,14 @@ namespace Automate.Tests.ViewModels
         [TestMethod]
         public void DateSelected_SelectedDateContainsManyTasks_EventTitlesValuesAreCorrect()
         {
-            UpcomingTask returnedTask1 = new UpcomingTask() { Title = EventType.Semis };
-            UpcomingTask returnedTask2 = new UpcomingTask() { Title = EventType.Entretien };
+            string expectedTask1 = EventType.Semis.ToString();
+            string expectedTask2 = EventType.Entretien.ToString();
+            SetupForValidDateSelectedManyTasks();
 
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
-                .Returns(new List<UpcomingTask>() { returnedTask1, returnedTask2 });
+            calendarViewModel!.DateSelected();
 
-            calendarViewModel.DateSelected();
-
-            Assert.AreEqual(returnedTask1.Title.ToString(), calendarViewModel.EventTitles[0]);
-            Assert.AreEqual(returnedTask2.Title.ToString(), calendarViewModel.EventTitles[1]);
+            Assert.AreEqual(expectedTask1, calendarViewModel.EventTitles[0]);
+            Assert.AreEqual(expectedTask2, calendarViewModel.EventTitles[1]);
         }
 
         [TestMethod]
@@ -148,11 +134,7 @@ namespace Automate.Tests.ViewModels
         [TestMethod]
         public void AddTask_SelectedDateIsValid_CallTasksServices()
         {
-            DateTime selectedDate = DateTime.Today;
-            calendarViewModel!.SelectedDate = selectedDate;
-
-            taskFormViewModelMock!.Setup(x => x.SelectedEventType).Returns(EventType.Semis);
-            navigationUtilsMock!.Setup(x => x.GetTaskFormValues(selectedDate, null)).Returns(taskFormViewModelMock.Object);
+            SetupForValidAddTask();
 
             calendarViewModel!.AddTask();
 
@@ -163,19 +145,9 @@ namespace Automate.Tests.ViewModels
         public void AddTask_SelectedDateIsValid_EventTitlesCountIsOne()
         {
             const int expectedCount = 1;
-            UpcomingTask returnedTask = new UpcomingTask() { Title = EventType.Semis };
+            SetupForValidAddTask();
 
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
-                .Returns(new List<UpcomingTask>() { returnedTask });
-
-            DateTime selectedDate = DateTime.Today;
-            calendarViewModel!.SelectedDate = selectedDate;
-
-            taskFormViewModelMock!.Setup(x => x.SelectedEventType).Returns(EventType.Semis);
-            navigationUtilsMock!.Setup(x => x.GetTaskFormValues(selectedDate, null)).Returns(taskFormViewModelMock.Object);
-
-            calendarViewModel.AddTask();
+            calendarViewModel!.AddTask();
 
             Assert.AreEqual(expectedCount, calendarViewModel.EventTitles.Count);
         }
@@ -184,22 +156,132 @@ namespace Automate.Tests.ViewModels
         public void AddTask_SelectedDateIsValid_EventTitlesValueIsCorrect()
         {
             string expectedValue = EventType.Semis.ToString();
+            SetupForValidAddTask();
+
+            calendarViewModel!.AddTask();
+
+            Assert.AreEqual(expectedValue, calendarViewModel.EventTitles[0]);
+        }
+
+        [TestMethod]
+        public void EditTask_SelectedDateInvalid_AddErrorToErrorsCollection()
+        {
+            calendarViewModel!.EditTask();
+
+            Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void EditTask_SelectedEventTitleInvalid_AddErrorToErrorsCollection()
+        {
+            calendarViewModel!.EditTask();
+
+            Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void EditTask_TaskToEditInvalid_AddErrorToErrorsCollection()
+        {
+            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedDate = DateTime.Today;
+
+            calendarViewModel.EditTask();
+
+            Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void EditTask_TaskToEditValid_RemoveErrorsFromErrorsCollection()
+        {
+            SetupForValidEditTask();
+
+            calendarViewModel!.EditTask();
+
+            Assert.IsFalse(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void EditTask_TaskToEditValid_CallTasksServices()
+        {
+            SetupForValidEditTask();
+
+            calendarViewModel!.EditTask();
+
+            tasksServicesMock!.Verify(
+                x => x.UpdateTask(It.IsAny<ObjectId>(), It.IsAny<UpdateDefinition<UpcomingTask>>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void EditTask_SelectedDateIsValid_EventTitlesCountIsOne()
+        {
+            const int expectedCount = 1;
+            SetupForValidEditTask();
+
+            calendarViewModel!.EditTask();
+
+            Assert.AreEqual(expectedCount, calendarViewModel.EventTitles.Count);
+        }
+
+        [TestMethod]
+        public void EditTask_SelectedDateIsValid_EventTitlesValueIsCorrect()
+        {
+            string expectedValue = EventType.Semis.ToString();
+            SetupForValidEditTask();
+
+            calendarViewModel!.EditTask();
+
+            Assert.AreEqual(expectedValue, calendarViewModel.EventTitles[0]);
+        }
+
+        private void SetupForValidDateSelectedOneTask()
+        {
             UpcomingTask returnedTask = new UpcomingTask() { Title = EventType.Semis };
 
             calendarViewModel!.SelectedDate = DateTime.Today;
             tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
                 .Returns(new List<UpcomingTask>() { returnedTask });
+        }
+
+        private void SetupForValidDateSelectedManyTasks()
+        {
+            UpcomingTask returnedTask1 = new UpcomingTask() { Title = EventType.Semis };
+            UpcomingTask returnedTask2 = new UpcomingTask() { Title = EventType.Entretien };
+
+            calendarViewModel!.SelectedDate = DateTime.Today;
+            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
+                .Returns(new List<UpcomingTask>() { returnedTask1, returnedTask2 });
+        }
+
+        private void SetupForValidAddTask()
+        {
+            SetupForValidDateSelectedOneTask();
 
             DateTime selectedDate = DateTime.Today;
             calendarViewModel!.SelectedDate = selectedDate;
 
             taskFormViewModelMock!.Setup(x => x.SelectedEventType).Returns(EventType.Semis);
             navigationUtilsMock!.Setup(x => x.GetTaskFormValues(selectedDate, null)).Returns(taskFormViewModelMock.Object);
-
-            calendarViewModel.AddTask();
-
-            Assert.AreEqual(expectedValue, calendarViewModel.EventTitles[0]);
         }
 
+        private void SetupForValidEditTask()
+        {
+            SetupForValidDateSelectedOneTask();
+
+            DateTime selectedDate = DateTime.Today;
+
+            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedDate = selectedDate;
+
+            UpcomingTask existingTask = new UpcomingTask() { Title = EventType.Semis };
+            calendarViewModel!.SelectedDate = selectedDate;
+            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
+                .Returns(new List<UpcomingTask>() { existingTask });
+
+            taskFormViewModelMock!.Setup(x => x.SelectedEventType).Returns(EventType.Arrosage);
+            navigationUtilsMock!.Setup(
+                x => x.GetTaskFormValues(selectedDate, It.IsAny<EventType>())).Returns(taskFormViewModelMock.Object);
+
+            calendarViewModel.DateSelected();
+        }
     }
 }
