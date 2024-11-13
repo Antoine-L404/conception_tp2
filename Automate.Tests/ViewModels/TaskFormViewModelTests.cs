@@ -2,7 +2,6 @@
 using Automate.Utils;
 using Automate.Utils.Enums;
 using Automate.ViewModels;
-using Automate.Views;
 using Moq;
 using System.ComponentModel;
 using System.Windows;
@@ -10,7 +9,7 @@ using System.Windows;
 namespace Automate.Tests.ViewModels
 {
     [TestClass]
-    public class TaskViewModelTests
+    public class TaskFormViewModelTests
     {
         private TaskFormViewModel? taskFormViewModel;
         private Mock<Window>? mockWindow;
@@ -24,9 +23,8 @@ namespace Automate.Tests.ViewModels
             {
                 mockWindow = new Mock<Window>();
                 mockPropertyChanged = new Mock<PropertyChangedEventHandler>();
-                taskFormViewModel = new TaskFormViewModel(mockWindow.Object, new DateTime(), new NavigationUtils());
                 mockNavigationUtils = new Mock<INavigationUtils>();
-
+                taskFormViewModel = new TaskFormViewModel(mockWindow.Object, new DateTime(), mockNavigationUtils.Object);
             });
 
             thread.SetApartmentState(ApartmentState.STA);
@@ -45,23 +43,30 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void AddEvent_EventTypeIsInvalid_ErrorCollectionHasErrors()
-        {
-            taskFormViewModel!.AddEvent();
-
-            Assert.AreEqual(true, taskFormViewModel.HasErrors);
-        }
-
-        [TestMethod]
         public void SetEventType_WhenErrorCollectionHasErrors_And_NewValueIsValid_RemovesErrors()
         {
-            taskFormViewModel!.AddEvent();
-
+            taskFormViewModel!.AddTask();
             const EventType eventType = EventType.Recolte;
 
             taskFormViewModel!.SelectedEventType = eventType;
 
             Assert.AreEqual(false, taskFormViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void AddTask_EventTypeIsInvalid_ErrorCollectionHasErrors()
+        {
+            taskFormViewModel!.AddTask();
+
+            Assert.AreEqual(true, taskFormViewModel.HasErrors);
+        }
+
+        [TestMethod]
+        public void Cancel_CloseWindow()
+        {
+            taskFormViewModel!.Cancel();
+
+            mockNavigationUtils!.Verify(x => x.Close(It.IsAny<Window>()), Times.Once());
         }
     }
 }

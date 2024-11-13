@@ -38,8 +38,8 @@ namespace Automate.ViewModels
             }
         }
 
-        public ICommand OnAddEventClick { get; }
-        public ICommand OnCancelEventClick { get; }
+        public ICommand AddTaskCommand { get; }
+        public ICommand CancelCommand { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
@@ -53,8 +53,8 @@ namespace Automate.ViewModels
 
         public TaskFormViewModel(Window openedWindow, DateTime selectedDate, INavigationUtils navigationUtils, EventType? initialEventType = null)
         {
-            OnAddEventClick = new RelayCommand(AddEvent);
-            OnCancelEventClick = new RelayCommand(CancelEvent);
+            AddTaskCommand = new RelayCommand(AddTask);
+            CancelCommand = new RelayCommand(Cancel);
 
             this.navigationUtils = navigationUtils;
 
@@ -76,7 +76,7 @@ namespace Automate.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void AddEvent()
+        public void AddTask()
         {
             if (SelectedEventType != null)
             {
@@ -90,7 +90,7 @@ namespace Automate.ViewModels
             }
         }
 
-        public void CancelEvent()
+        public void Cancel()
         {
             navigationUtils.Close(window);
         }

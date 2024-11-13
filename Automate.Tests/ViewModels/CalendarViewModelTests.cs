@@ -31,10 +31,10 @@ namespace Automate.Tests.ViewModels
             thread.Join();
         }
 
-        [TestMethod]
-        public void test()
-        {
-            Assert.IsTrue(true);
-        }
+        //[TestMethod]
+        //public void test()
+        //{
+        //    Assert.IsTrue(true);
+        //}
     }
 }

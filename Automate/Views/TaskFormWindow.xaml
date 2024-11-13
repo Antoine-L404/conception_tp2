@@ -17,8 +17,8 @@
             <TextBox x:Name="eventDateTextBox" Text="{Binding EventDate}" IsReadOnly="True" Width="200" Margin="0 10" HorizontalAlignment="Left" />
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,20,0,0">
-                <Button Content="Ajouter" Command="{Binding OnAddEventClick}" Width="75" Margin="5"/>
-                <Button Content="Annuler" Command="{Binding OnCancelEventClick}" Width="75" Margin="5"/>
+                <Button Content="Ajouter" Command="{Binding AddTaskCommand}" Width="75" Margin="5"/>
+                <Button Content="Annuler" Command="{Binding CancelCommand}" Width="75" Margin="5"/>
             </StackPanel>
             <TextBlock Foreground="#c50500" 
                Text="{Binding ErrorMessages}"
