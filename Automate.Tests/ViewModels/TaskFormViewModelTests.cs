@@ -1,9 +1,7 @@
 ﻿using Automate.Abstract.Utils;
-using Automate.Utils;
 using Automate.Utils.Enums;
 using Automate.ViewModels;
 using Moq;
-using System.ComponentModel;
 using System.Windows;
 
 namespace Automate.Tests.ViewModels
@@ -13,7 +11,6 @@ namespace Automate.Tests.ViewModels
     {
         private TaskFormViewModel? taskFormViewModel;
         private Mock<Window>? mockWindow;
-        private Mock<PropertyChangedEventHandler>? mockPropertyChanged;
         private Mock<INavigationUtils>? mockNavigationUtils;
 
         [TestInitialize]
@@ -22,7 +19,6 @@ namespace Automate.Tests.ViewModels
             Thread thread = new(() =>
             {
                 mockWindow = new Mock<Window>();
-                mockPropertyChanged = new Mock<PropertyChangedEventHandler>();
                 mockNavigationUtils = new Mock<INavigationUtils>();
                 taskFormViewModel = new TaskFormViewModel(mockWindow.Object, new DateTime(), mockNavigationUtils.Object);
             });
