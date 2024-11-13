@@ -76,7 +76,7 @@ namespace Automate.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void AddEvent()
+        public void AddEvent()
         {
             if (SelectedEventType != null)
             {
@@ -90,7 +90,7 @@ namespace Automate.ViewModels
             }
         }
 
-        private void CancelEvent()
+        public void CancelEvent()
         {
             navigationUtils.Close(window);
         }

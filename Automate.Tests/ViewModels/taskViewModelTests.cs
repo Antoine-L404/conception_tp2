@@ -1,6 +1,8 @@
-﻿using Automate.Utils;
+﻿using Automate.Abstract.Utils;
+using Automate.Utils;
 using Automate.Utils.Enums;
 using Automate.ViewModels;
+using Automate.Views;
 using Moq;
 using System.ComponentModel;
 using System.Windows;
@@ -13,6 +15,7 @@ namespace Automate.Tests.ViewModels
         private TaskFormViewModel? taskFormViewModel;
         private Mock<Window>? mockWindow;
         private Mock<PropertyChangedEventHandler>? mockPropertyChanged;
+        private Mock<INavigationUtils>? mockNavigationUtils;
 
         [TestInitialize]
         public void TestInitialize()
@@ -22,8 +25,8 @@ namespace Automate.Tests.ViewModels
                 mockWindow = new Mock<Window>();
                 mockPropertyChanged = new Mock<PropertyChangedEventHandler>();
                 taskFormViewModel = new TaskFormViewModel(mockWindow.Object, new DateTime(), new NavigationUtils());
+                mockNavigationUtils = new Mock<INavigationUtils>();
 
-                taskFormViewModel.PropertyChanged += mockPropertyChanged.Object;
             });
 
             thread.SetApartmentState(ApartmentState.STA);
@@ -42,13 +45,23 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void SetEventDate_ValueIsValid_EventDateIsCorrectlySet()
+        public void AddEvent_EventTypeIsInvalid_ErrorCollectionHasErrors()
         {
-            DateTime eventdate = DateTime.Now;
+            taskFormViewModel!.AddEvent();
 
-            taskFormViewModel!.EventDate = eventdate.ToShortDateString();
+            Assert.AreEqual(true, taskFormViewModel.HasErrors);
+        }
 
-            Assert.Equals(eventdate, taskFormViewModel.EventDate);
+        [TestMethod]
+        public void SetEventType_WhenErrorCollectionHasErrors_And_NewValueIsValid_RemoveErrors()
+        {
+            taskFormViewModel!.AddEvent();
+
+            const EventType eventType = EventType.Recolte;
+
+            taskFormViewModel!.SelectedEventType = eventType;
+
+            Assert.AreEqual(false, taskFormViewModel!.HasErrors);
         }
     }
 }
