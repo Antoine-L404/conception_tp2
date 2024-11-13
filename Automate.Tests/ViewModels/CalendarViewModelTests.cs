@@ -233,6 +233,53 @@ namespace Automate.Tests.ViewModels
             Assert.AreEqual(expectedValue, calendarViewModel.EventTitles[0]);
         }
 
+        [TestMethod]
+        public void DeleteTask_SelectedDateInvalid_AddErrorToErrorsCollection()
+        {
+            calendarViewModel!.DeleteTask();
+
+            Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void DeleteTask_SelectedEventTitleInvalid_AddErrorToErrorsCollection()
+        {
+            calendarViewModel!.DeleteTask();
+
+            Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void DeleteTask_TaskToEditInvalid_AddErrorToErrorsCollection()
+        {
+            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedDate = DateTime.Today;
+
+            calendarViewModel.DeleteTask();
+
+            Assert.IsTrue(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void DeleteTask_TaskToDeleteValid_RemoveErrorsFromErrorsCollection()
+        {
+            SetupForValidDeleteTask();
+
+            calendarViewModel!.DeleteTask();
+
+            Assert.IsFalse(calendarViewModel!.HasErrors);
+        }
+
+        [TestMethod]
+        public void DeleteTask_TaskToDeleteValid_CallTasksServices()
+        {
+            SetupForValidDeleteTask();
+
+            calendarViewModel!.DeleteTask();
+
+            tasksServicesMock!.Verify(x => x.DeleteTask(It.IsAny<ObjectId>()), Times.Once());
+        }
+
         private void SetupForValidDateSelectedOneTask()
         {
             UpcomingTask returnedTask = new UpcomingTask() { Title = EventType.Semis };
@@ -280,6 +327,23 @@ namespace Automate.Tests.ViewModels
             taskFormViewModelMock!.Setup(x => x.SelectedEventType).Returns(EventType.Arrosage);
             navigationUtilsMock!.Setup(
                 x => x.GetTaskFormValues(selectedDate, It.IsAny<EventType>())).Returns(taskFormViewModelMock.Object);
+
+            calendarViewModel.DateSelected();
+        }
+
+        private void SetupForValidDeleteTask()
+        {
+            SetupForValidDateSelectedOneTask();
+
+            DateTime selectedDate = DateTime.Today;
+
+            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedDate = selectedDate;
+
+            UpcomingTask existingTask = new UpcomingTask() { Title = EventType.Semis };
+            calendarViewModel!.SelectedDate = selectedDate;
+            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
+                .Returns(new List<UpcomingTask>() { existingTask });
 
             calendarViewModel.DateSelected();
         }

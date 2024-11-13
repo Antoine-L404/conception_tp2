@@ -124,7 +124,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
             !ValidateExistingTask(SelectedEventTitle!, SelectedDate!.Value))
             return;
 
-        HandleDelete(SelectedEventTitle!, SelectedDate!.Value);
+        HandleDelete(SelectedEventTitle!);
         HighlightEventDates();
         ShowTaskDetails(SelectedDate!.Value);
     }
@@ -194,8 +194,8 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
         tasksServices.CreateTask(newTask);
 
-        MessageBox.Show(
-            $"Événement '{taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
+        //MessageBox.Show(
+        //    $"Événement '{taskFormViewModel.SelectedEventType}' ajouté pour le {taskDate.ToShortDateString()}");
     }
 
     private void HandleEditForm(string taskTitle, DateTime taskDate)
@@ -211,29 +211,17 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
             .Set(t => t.EventDate, taskDate);
         tasksServices.UpdateTask(taskToEdit.Id, updateDefinition);
 
-        MessageBox.Show(
-            $"Événement '{taskFormViewModel.SelectedEventType}' modifié pour le {taskDate.ToShortDateString()}");
+        //MessageBox.Show(
+        //    $"Événement '{taskFormViewModel.SelectedEventType}' modifié pour le {taskDate.ToShortDateString()}");
     }
 
-    public void HandleDelete(string taskTitle, DateTime taskDate)
+    public void HandleDelete(string taskTitle)
     {
-        if (!AskForDeletion(taskTitle, taskDate))
-            return;
-
         UpcomingTask taskToDelete = selectedDateTasks.Find(task => task.Title.ToString() == taskTitle)!;
 
         tasksServices.DeleteTask(taskToDelete.Id);
 
-        MessageBox.Show("Événement supprimé avec succès.");
-    }
-
-    private bool AskForDeletion(string taskTitle, DateTime taskDate)
-    {
-        var result = MessageBox.Show(
-            $"Voulez-vous vraiment supprimer l'événement {taskTitle} du {taskDate.ToShortDateString()} ?",
-            "Confirmation de suppression", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-        return result == MessageBoxResult.Yes;
+        //MessageBox.Show("Événement supprimé avec succès.");
     }
 
     private bool ValidateSelectedDate()
