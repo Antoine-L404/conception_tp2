@@ -19,6 +19,8 @@ using MongoDB.Driver;
 using Automate.Abstract.Services;
 using Automate.Abstract.Utils;
 using Automate.Abstract.ViewModels;
+using Automate.ViewModels;
+using Automate.Views;
 
 public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
@@ -28,6 +30,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
     private readonly ITasksServices tasksServices;
     private readonly INavigationUtils navigationUtils;
+    private Window window;
 
     private ErrorsCollection errorsCollection;
     private List<UpcomingTask> selectedDateTasks;
@@ -37,6 +40,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     public ICommand DeleteTaskCommand { get; }
     public ICommand MonthChangedCommand { get; }
     public ICommand DateSelectedCommand { get; }
+    public ICommand GoToHomeCommand { get; }
 
     public bool HasErrors => errorsCollection.ContainsAnyError();
     public string ErrorMessages
@@ -64,11 +68,12 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         }
     }
 
-    public CalendarViewModel(Calendar calendar, ITasksServices tasksServices, INavigationUtils navigationUtils)
+    public CalendarViewModel(Window openedWindow, Calendar calendar, ITasksServices tasksServices, INavigationUtils navigationUtils)
     {
         Calendar = calendar;
         this.tasksServices = tasksServices;
         this.navigationUtils = navigationUtils;
+        window = openedWindow;
 
         errorsCollection = new ErrorsCollection(ErrorsChanged);
         selectedDateTasks = new List<UpcomingTask>();
@@ -78,6 +83,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
         DeleteTaskCommand = new RelayCommand(DeleteTask);
         DateSelectedCommand = new RelayCommand(DateSelected);
         MonthChangedCommand = new RelayCommand(HighlightEventDates);
+        GoToHomeCommand = new RelayCommand(GoToHome);
         
         HighlightEventDates();
         ShowTaskDetails(DateTime.Today);
@@ -103,6 +109,11 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     }
 
     public IEnumerable GetErrors(string? propertyName) => errorsCollection.GetErrors(propertyName);
+
+    public void GoToHome()
+    {
+        navigationUtils.NavigateToAndCloseCurrentWindow<HomeWindow>(window);
+    }
 
     public void DateSelected()
     {

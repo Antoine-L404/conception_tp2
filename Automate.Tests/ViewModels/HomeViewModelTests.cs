@@ -43,19 +43,19 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void CriticalTaskMessage_NoCriticalTask_ReturnFalse()
+        public void CriticalTaskMessage_NoCriticalTask_ReturnEmptyString()
         {
             tasksServices!.Setup(x => x.DoesTodayHasCriticalTask()).Returns(false);
 
-            Assert.AreEqual(alertMessage, homeViewModel!.CriticalTaskMessage);
+            Assert.AreEqual("", homeViewModel!.CriticalTaskMessage);
         }
 
         [TestMethod]
-        public void CriticalTaskMessage_HasCriticalTask_ReturnTrue()
+        public void CriticalTaskMessage_HasCriticalTask_ReturnAlertMessage()
         {
             tasksServices!.Setup(x => x.DoesTodayHasCriticalTask()).Returns(true);
 
-            Assert.AreEqual("", homeViewModel!.CriticalTaskMessage);
+            Assert.AreEqual(alertMessage, homeViewModel!.CriticalTaskMessage);
         }
     }
 }

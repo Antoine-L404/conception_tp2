@@ -7,6 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;
 using System.ComponentModel;
+using System.Windows;
 
 namespace Automate.Tests.ViewModels
 {
@@ -20,6 +21,7 @@ namespace Automate.Tests.ViewModels
         private Mock<INavigationUtils>? navigationUtilsMock;
         private Mock<ITaskFormViewModel>? taskFormViewModelMock;
         private Mock<PropertyChangedEventHandler>? propertyChangedMock;
+        private Mock<Window>? windowMock;
 
         [TestInitialize]
         public void TestInitialize()
@@ -32,8 +34,9 @@ namespace Automate.Tests.ViewModels
                 navigationUtilsMock = new Mock<INavigationUtils>();
                 taskFormViewModelMock = new Mock<ITaskFormViewModel>();
                 propertyChangedMock = new Mock<PropertyChangedEventHandler>();
+                windowMock = new Mock<Window>();
 
-                calendarViewModel = new CalendarViewModel(
+                calendarViewModel = new CalendarViewModel(windowMock.Object,
                     null!, tasksServicesMock.Object, navigationUtilsMock.Object);
 
                 calendarViewModel.PropertyChanged += propertyChangedMock.Object;
