@@ -43,5 +43,10 @@ namespace Automate.Services
         {
             return mongoDBService.DeleteOne(tasks, taskId);
         }
+
+        public bool DoesTodayHasCriticalTask()
+        {
+            return mongoDBService.GetMany(tasks, task => task.EventDate == DateTime.Today).Count > 0;
+        }
     }
 }

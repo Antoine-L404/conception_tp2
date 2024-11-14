@@ -13,5 +13,6 @@ namespace Automate.Abstract.Services
         List<UpcomingTask> GetAllTasks();
         List<UpcomingTask> GetTasksByDate(DateTime date);
         bool UpdateTask(ObjectId taskId, UpdateDefinition<UpcomingTask> updates);
+        bool DoesTodayHasCriticalTask();
     }
 }

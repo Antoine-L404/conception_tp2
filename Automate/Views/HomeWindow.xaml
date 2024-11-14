@@ -34,6 +34,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Border Grid.Column="0" Background="LightGray" Margin="10" Padding="10">
+                    <TextBox Text="{Binding DoesTodayHasCriticalTask}"></TextBox>
                 </Border>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10">
