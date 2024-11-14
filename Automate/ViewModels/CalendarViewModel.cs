@@ -182,14 +182,13 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
             if (calendarDayButton.DataContext is DateTime date)
             {
                 List<UpcomingTask> tasks = tasksServices.GetTasksByDate(date);
-                calendarDayButton.Background = 
-                    tasks.Count > 0 ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Transparent);
-                tasks.ForEach(task => {
-                    if (task.Title == EventType.Arrosage || task.Title == EventType.Semis)
-                    {
-                        calendarDayButton.Background = new SolidColorBrush(Colors.Red);
-                    }
-                });
+
+                if (tasks.Count == 0)
+                    calendarDayButton.Background = new SolidColorBrush(Colors.Transparent);
+                else if (tasks.Find(x => x.Title == EventType.Arrosage || x.Title == EventType.Semis) != null)
+                    calendarDayButton.Background = new SolidColorBrush(Colors.Red);
+                else
+                    calendarDayButton.Background = new SolidColorBrush(Colors.Green);
             }
         }
     }
