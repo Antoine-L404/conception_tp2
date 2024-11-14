@@ -1,4 +1,6 @@
-﻿using Automate.Services.Commands;
+﻿using Automate.Abstract.Utils;
+using Automate.Abstract.ViewModels;
+using Automate.Services.Commands;
 using Automate.Utils.Enums;
 using Automate.Utils.Validation;
 using System;
@@ -12,18 +14,19 @@ using System.Windows.Input;
 
 namespace Automate.ViewModels
 {
-    public class TaskFormViewModel: INotifyPropertyChanged, INotifyDataErrorInfo
+    public class TaskFormViewModel : INotifyPropertyChanged, INotifyDataErrorInfo, ITaskFormViewModel
     {
         private Window window;
         private ErrorsCollection errorsCollection;
+        private readonly INavigationUtils navigationUtils;
 
         public string EventDate { get; set; }
         public IEnumerable<EventType> EventTypes { get; set; }
 
         private EventType? selectedEventType;
-        public EventType? SelectedEventType 
-        { 
-            get => selectedEventType; 
+        public EventType? SelectedEventType
+        {
+            get => selectedEventType;
             set
             {
                 selectedEventType = value;
@@ -31,29 +34,29 @@ namespace Automate.ViewModels
                 if (value != null)
                 {
                     errorsCollection.RemoveError(nameof(SelectedEventType));
-                    NotifyErrorChange();
+                    OnPropertyChanged(nameof(ErrorMessages));
                 }
             }
         }
-        public bool IsConfirmed { get; private set; }
 
-        public ICommand OnAddEventClick { get; }
-        public ICommand OnCancelEventClick { get; }
+        public ICommand AddTaskCommand { get; }
+        public ICommand CancelCommand { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
         public bool HasErrors => errorsCollection.ContainsAnyError();
-        public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(SelectedEventType));
         public string ErrorMessages
         {
             get => errorsCollection.GetAllErrorMessages();
         }
 
-        public TaskFormViewModel(Window openedWindow, DateTime selectedDate, EventType? initialEventType = null) 
+        public TaskFormViewModel(Window openedWindow, DateTime selectedDate, INavigationUtils navigationUtils, EventType? initialEventType = null)
         {
-            OnAddEventClick = new RelayCommand(AddEvent);
-            OnCancelEventClick = new RelayCommand(CancelEvent);
+            AddTaskCommand = new RelayCommand(AddTask);
+            CancelCommand = new RelayCommand(Cancel);
+
+            this.navigationUtils = navigationUtils;
 
             errorsCollection = new ErrorsCollection(ErrorsChanged);
 
@@ -73,30 +76,23 @@ namespace Automate.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void AddEvent()
+        public void AddTask()
         {
             if (SelectedEventType != null)
             {
-                IsConfirmed = true;
-                window.Close();
+                window.DialogResult = true;
+                navigationUtils.Close(window);
             }
             else
             {
                 errorsCollection.AddError(nameof(SelectedEventType), "Veuillez sélectionner un type d'événement");
-                NotifyErrorChange();
+                OnPropertyChanged(nameof(ErrorMessages));
             }
         }
 
-        private void CancelEvent()
+        public void Cancel()
         {
-            IsConfirmed = false;
-            window.Close();
-        }
-
-        private void NotifyErrorChange()
-        {
-            OnPropertyChanged(nameof(ErrorMessages));
-            OnPropertyChanged(nameof(HasPasswordErrors));
+            navigationUtils.Close(window);
         }
     }
 }

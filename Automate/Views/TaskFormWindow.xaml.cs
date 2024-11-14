@@ -1,4 +1,5 @@
-﻿using Automate.Utils.Enums;
+﻿using Automate.Utils;
+using Automate.Utils.Enums;
 using Automate.ViewModels;
 using System;
 using System.Windows;
@@ -12,7 +13,7 @@ namespace Automate.Views
         public TaskFormWindow(DateTime selectedDate, EventType? initialEventType = null)
         {
             InitializeComponent();
-            taskFormViewModel = new TaskFormViewModel(this, selectedDate, initialEventType);
+            taskFormViewModel = new TaskFormViewModel(this, selectedDate, new NavigationUtils(), initialEventType);
             DataContext = taskFormViewModel;
         }
     }

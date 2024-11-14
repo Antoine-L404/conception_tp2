@@ -1,6 +1,8 @@
 using Automate.Abstract.Services;
+using Automate.Abstract.Utils;
 using Automate.Models;
 using Automate.ViewModels;
+using Automate.Views;
 using Moq;
 using System.ComponentModel;
 using System.Windows;
@@ -14,6 +16,7 @@ namespace Automate.Tests.ViewModels
         private Mock<Window>? mockWindow;
         private Mock<IUserServices>? mockUserService;
         private Mock<PropertyChangedEventHandler>? mockPropertyChanged;
+        private Mock<INavigationUtils>? mockNavigationUtils;
 
         private readonly User? NULL_USER = null;
 
@@ -25,8 +28,9 @@ namespace Automate.Tests.ViewModels
                 mockUserService = new Mock<IUserServices>();
                 mockWindow = new Mock<Window>();
                 mockPropertyChanged = new Mock<PropertyChangedEventHandler>();
+                mockNavigationUtils = new Mock<INavigationUtils>();
 
-                loginViewModel = new LoginViewModel(mockWindow.Object, mockUserService.Object, false);
+                loginViewModel = new LoginViewModel(mockWindow.Object, mockUserService.Object, mockNavigationUtils.Object);
 
                 loginViewModel.PropertyChanged += mockPropertyChanged.Object;
             });
@@ -47,13 +51,16 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void onPropertyChanged_change_propertyUsername()
+        public void SetUsername_ValueIsValid_OnPropertyChangedIsInvoked()
         {
             const string argPropertyName = "Username";
 
             loginViewModel!.Username = "username";
 
-            mockPropertyChanged!.Verify(x => x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)), Times.Once());
+            mockPropertyChanged!.Verify(x => 
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)), 
+                Times.Once()
+            );
         }
 
         [TestMethod]
@@ -67,29 +74,48 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void onPropertyChanged_change_propertyPassword()
+        public void SetPassword_ValueIsValid_OnPropertyChangedIsInvoked()
         {
             const string argPropertyName = "Password";
 
             loginViewModel!.Password = "password";
 
-            mockPropertyChanged!.Verify(x => x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)), Times.Once());
+            mockPropertyChanged!.Verify(x => 
+                x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)), 
+                Times.Once()
+            );
         }
 
 
         [TestMethod]
-        public void Authenticate_UserExists_AuthenticateUser()
+        public void Authenticate_UserExists_CallAuthenticateUserService()
         {
             User validUser = new User { Username = "username", Password = "password" };
             const string username = "username";
             const string password = "password";
 
             loginViewModel!.Username = username;
-            loginViewModel.Password = password;
+            loginViewModel!.Password = password;
             mockUserService!.Setup(us => us.Authenticate(username, password)).Returns(validUser);
             loginViewModel.Authenticate();
 
             mockUserService.Verify(us => us.Authenticate(username, password), Times.Once);
+        }
+
+        [TestMethod]
+        public void Authenticate_UserExists_NavigateToHomeWindow()
+        {
+            User validUser = new User { Username = "username", Password = "password" };
+            const string username = "username";
+            const string password = "password";
+
+            loginViewModel!.Username = username;
+            loginViewModel!.Password = password;
+            mockUserService!.Setup(us => us.Authenticate(username, password)).Returns(validUser);
+            loginViewModel.Authenticate();
+
+            mockNavigationUtils!.Verify(
+                x => x.NavigateToAndCloseCurrentWindow<HomeWindow>(It.IsAny<Window>()), Times.Once());
         }
 
         [TestMethod]
@@ -99,11 +125,11 @@ namespace Automate.Tests.ViewModels
             const string wrongPassword = "wrongPassword";
 
             loginViewModel!.Username = username;
-            loginViewModel.Password = wrongPassword;
+            loginViewModel!.Password = wrongPassword;
             mockUserService!.Setup(us => us.Authenticate(username, wrongPassword)).Returns(NULL_USER);
-            loginViewModel.Authenticate();
+            loginViewModel!.Authenticate();
 
-            mockUserService.Verify(us => us.Authenticate(username, wrongPassword), Times.Once);
+            Assert.AreEqual(true, loginViewModel.HasErrors);
         }
     }
 }

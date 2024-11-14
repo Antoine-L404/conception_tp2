@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Automate.Utils;
+using System.Windows;
 
 namespace Automate.Views
 {
@@ -11,7 +12,7 @@ namespace Automate.Views
 
         private void Calendar_Loaded(object sender, RoutedEventArgs e)
         {
-            DataContext = new CalendarViewModel(calendar);
+            DataContext = new CalendarViewModel(calendar, Environment.tasksServices, new NavigationUtils());
         }
     }
 }

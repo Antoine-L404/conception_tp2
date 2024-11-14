@@ -1,4 +1,5 @@
-﻿using Automate.ViewModels;
+﻿using Automate.Utils;
+using Automate.ViewModels;
 using System.Windows;
 
 namespace Automate.Views
@@ -11,7 +12,7 @@ namespace Automate.Views
         public HomeWindow()
         {
             InitializeComponent();
-            DataContext = new HomeViewModel(this);
+            DataContext = new HomeViewModel(this, new NavigationUtils());
         }
     }
 }

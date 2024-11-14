@@ -28,7 +28,7 @@ namespace Automate.Tests.Utils.Validation
         [TestMethod]
         public void ValidateNullOrEmpty_PropertyIsNull_ErrorIsAdded()
         {
-            CommonValidation.ValidateNullOrEmpty(PROPERTY_NAME, null, ERROR_MESSAGE, errorCollection, emptyAction);
+            CommonValidation.ValidateStringNullOrEmpty(PROPERTY_NAME, null, ERROR_MESSAGE, errorCollection, emptyAction);
 
             errorCollectionMock.Verify(x => x.AddError(PROPERTY_NAME, ERROR_MESSAGE), Times.Once());
         }
@@ -38,7 +38,7 @@ namespace Automate.Tests.Utils.Validation
         {
             actionResult = "";
 
-            CommonValidation.ValidateNullOrEmpty(PROPERTY_NAME, null, ERROR_MESSAGE, errorCollection, emptyAction);
+            CommonValidation.ValidateStringNullOrEmpty(PROPERTY_NAME, null, ERROR_MESSAGE, errorCollection, emptyAction);
 
             Assert.AreEqual(ACTION_VALUE, actionResult);
         }
@@ -46,7 +46,7 @@ namespace Automate.Tests.Utils.Validation
         [TestMethod]
         public void ValidateNullOrEmpty_PropertyIsEmpty_ErrorIsAdded()
         {
-            CommonValidation.ValidateNullOrEmpty(PROPERTY_NAME, string.Empty, ERROR_MESSAGE, errorCollection, emptyAction);
+            CommonValidation.ValidateStringNullOrEmpty(PROPERTY_NAME, string.Empty, ERROR_MESSAGE, errorCollection, emptyAction);
 
             errorCollectionMock.Verify(x => x.AddError(PROPERTY_NAME, ERROR_MESSAGE), Times.Once());
         }
@@ -56,7 +56,7 @@ namespace Automate.Tests.Utils.Validation
         {
             actionResult = "";
 
-            CommonValidation.ValidateNullOrEmpty(PROPERTY_NAME, string.Empty, ERROR_MESSAGE, errorCollection, emptyAction);
+            CommonValidation.ValidateStringNullOrEmpty(PROPERTY_NAME, string.Empty, ERROR_MESSAGE, errorCollection, emptyAction);
 
             Assert.AreEqual(ACTION_VALUE, actionResult);
         }
@@ -64,7 +64,7 @@ namespace Automate.Tests.Utils.Validation
         [TestMethod]
         public void ValidateNullOrEmpty_ValidProperty_ErrorIsRemoved()
         {
-            CommonValidation.ValidateNullOrEmpty(PROPERTY_NAME, PROPERTY, ERROR_MESSAGE, errorCollection, emptyAction);
+            CommonValidation.ValidateStringNullOrEmpty(PROPERTY_NAME, PROPERTY, ERROR_MESSAGE, errorCollection, emptyAction);
 
             errorCollectionMock.Verify(x => x.RemoveError(PROPERTY_NAME), Times.Once());
         }
@@ -74,7 +74,7 @@ namespace Automate.Tests.Utils.Validation
         {
             actionResult = "";
 
-            CommonValidation.ValidateNullOrEmpty(PROPERTY_NAME, string.Empty, ERROR_MESSAGE, errorCollection, emptyAction);
+            CommonValidation.ValidateStringNullOrEmpty(PROPERTY_NAME, string.Empty, ERROR_MESSAGE, errorCollection, emptyAction);
 
             Assert.AreEqual(ACTION_VALUE, actionResult);
         }

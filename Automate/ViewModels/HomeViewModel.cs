@@ -1,5 +1,5 @@
-﻿using Automate.Services.Commands;
-using Automate.Utils;
+﻿using Automate.Abstract.Utils;
+using Automate.Services.Commands;
 using Automate.Views;
 using System.Windows;
 using System.Windows.Input;
@@ -8,14 +8,15 @@ namespace Automate.ViewModels
 {
     public class HomeViewModel
     {
-        private readonly NavigationUtils navigationUtils;
+        private readonly INavigationUtils navigationUtils;
         private Window window;
+
         public ICommand GoToCalendarCommand { get; }
 
-        public HomeViewModel(Window openedWindow)
+        public HomeViewModel(Window openedWindow, INavigationUtils navigationUtils)
         {
-            navigationUtils = new NavigationUtils();
             window = openedWindow;
+            this.navigationUtils = navigationUtils;
             GoToCalendarCommand = new RelayCommand(GoToCalendar);
         }
 

@@ -13,11 +13,11 @@ xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
                       Loaded="Calendar_Loaded">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedDatesChanged">
-                        <behaviors:InvokeCommandAction Command="{Binding ClickOnDate}" />
+                        <behaviors:InvokeCommandAction Command="{Binding DateSelectedCommand}" />
                     </i:EventTrigger>
 
                     <i:EventTrigger EventName="DisplayDateChanged">
-                        <i:InvokeCommandAction Command="{Binding OnMonthChanged}" />
+                        <i:InvokeCommandAction Command="{Binding MonthChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Calendar>
@@ -31,14 +31,21 @@ xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-                <StackPanel Margin="20">
-                    <Button Content="Ajouter un événement" IsEnabled="{Binding IsAdmin}" Command="{Binding OnAddEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0" Width="162"/>
-                    <Button Content="Modifier l'événement" IsEnabled="{Binding IsAdmin}" Command="{Binding OnEditEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0" Width="161"/>
-                    <Button Content="Supprimer l'événement" IsEnabled="{Binding IsAdmin}" Command="{Binding OnDeleteEventClick}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0"/>
+                <StackPanel Margin="0 20">
+                    <Button Content="Ajouter un événement" IsEnabled="{Binding IsAdmin}" Command="{Binding AddTaskCommand}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0" Width="200"/>
+                    <Button Content="Modifier l'événement" IsEnabled="{Binding IsAdmin}" Command="{Binding EditTaskCommand}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0" Width="200"/>
+                    <Button Content="Supprimer l'événement" IsEnabled="{Binding IsAdmin}" Command="{Binding DeleteTaskCommand}" CommandParameter="{Binding SelectedDate}" Margin="0,10,0,0" Width="200"/>
                     <TextBlock Foreground="#c50500" 
                         Text="{Binding ErrorMessages}"
                         Width="200" Height="50" 
-                        Margin="10"
+                        Margin="0 10"
+                        HorizontalAlignment="Left"
+                        TextAlignment="Left"
+                        TextWrapping="Wrap"/>
+                    <TextBlock Foreground="#4fc978" 
+                        Text="{Binding SuccessMessage}"
+                        Width="200" Height="50" 
+                        Margin="0 10"
                         HorizontalAlignment="Left"
                         TextAlignment="Left"
                         TextWrapping="Wrap"/>

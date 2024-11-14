@@ -1,7 +1,7 @@
 ﻿using Automate.Abstract.Services;
+using Automate.Abstract.Utils;
 using Automate.Models;
 using Automate.Services.Commands;
-using Automate.Utils;
 using Automate.Utils.Validation;
 using Automate.Views;
 using System;
@@ -18,7 +18,7 @@ namespace Automate.ViewModels
     public class LoginViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         private readonly IUserServices userServices;
-        private readonly NavigationUtils navigationUtils;
+        private readonly INavigationUtils navigationUtils;
 
         private string? username;
         private string? password;
@@ -34,15 +34,13 @@ namespace Automate.ViewModels
         public ICommand AuthenticateCommand { get; }
         public bool HasErrors => errorsCollection.ContainsAnyError();
         public bool HasPasswordErrors => errorsCollection.ContainsError(nameof(Password));
-        private readonly bool shouldNavigate;
 
-        public LoginViewModel(Window openedWindow, IUserServices userServices, bool shouldNavigate = true)
+        public LoginViewModel(Window openedWindow, IUserServices userServices, INavigationUtils navigationUtils)
         {
             this.userServices = userServices;
-            this.shouldNavigate = shouldNavigate;
+            this.navigationUtils = navigationUtils;
             AuthenticateCommand = new RelayCommand(Authenticate);
 
-            navigationUtils = new NavigationUtils();
 
             errorsCollection = new ErrorsCollection(ErrorsChanged);
 
@@ -98,7 +96,7 @@ namespace Automate.ViewModels
                 NotifyErrorChange();
                 Trace.WriteLine("invalid");
             }
-            else if(shouldNavigate)
+            else
             {
                 Environment.authenticatedUser = user;
                 navigationUtils.NavigateToAndCloseCurrentWindow<HomeWindow>(window);
@@ -114,7 +112,7 @@ namespace Automate.ViewModels
 
         private void ValidateUsername()
         {
-            CommonValidation.ValidateNullOrEmpty(
+            CommonValidation.ValidateStringNullOrEmpty(
                 nameof(Username), 
                 Username, 
                 "Le nom d'utilisateur ne peut pas être vide.", 
@@ -124,7 +122,7 @@ namespace Automate.ViewModels
 
         private void ValidatePassword()
         {
-            CommonValidation.ValidateNullOrEmpty(
+            CommonValidation.ValidateStringNullOrEmpty(
                 nameof(Password), 
                 Password,
                 "Le mot de passe ne peut pas être vide.", 

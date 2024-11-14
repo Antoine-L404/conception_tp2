@@ -1,47 +1,47 @@
-﻿using Automate.Models;
+﻿using Automate.Abstract.Services;
+using Automate.Models;
 using Automate.Utils.Constants;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Automate.Services
 {
-    public class TaskCRUDService
+    public class TasksServices : ITasksServices
     {
+        private readonly IMongoDBServices mongoDBService;
         private readonly IMongoCollection<UpcomingTask> tasks;
 
-        public TaskCRUDService(MongoDBServices mongoDBService)
+        public TasksServices(IMongoDBServices mongoDBService)
         {
+            this.mongoDBService = mongoDBService;
             tasks = mongoDBService.GetCollection<UpcomingTask>(DBConstants.TASKS_COLLECTION_NAME);
         }
 
         public List<UpcomingTask> GetTasksByDate(DateTime date)
         {
-            return tasks.Find(task => task.EventDate == date).ToList();
+            return mongoDBService.GetMany(tasks, task => task.EventDate == date);
         }
 
         public List<UpcomingTask> GetAllTasks()
         {
-            return tasks.Find(new BsonDocument()).ToList();
+            return mongoDBService.GetAll(tasks);
         }
 
         public void CreateTask(UpcomingTask newTask)
         {
-            tasks.InsertOne(newTask);
+            mongoDBService.InsertOne(tasks, newTask);
         }
 
         public bool UpdateTask(ObjectId taskId, UpdateDefinition<UpcomingTask> updates)
         {
-            var result = tasks.UpdateOne(task => task.Id == taskId, updates);
-            return result.ModifiedCount > 0;
+            return mongoDBService.UpdateOne(tasks, taskId, updates);
         }
 
         public bool DeleteTask(ObjectId taskId)
         {
-            var result = tasks.DeleteOne(task => task.Id == taskId);
-            return result.DeletedCount > 0;
+            return mongoDBService.DeleteOne(tasks, taskId);
         }
     }
 }

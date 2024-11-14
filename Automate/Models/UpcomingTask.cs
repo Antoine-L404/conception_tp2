@@ -1,11 +1,12 @@
-﻿using Automate.Utils.Enums;
+﻿using Automate.Abstract.Models;
+using Automate.Utils.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 
 namespace Automate.Models
 {
-    public class UpcomingTask
+    public class UpcomingTask : IObjectWithId
     {
         [BsonId]
         public ObjectId Id { get; set; }

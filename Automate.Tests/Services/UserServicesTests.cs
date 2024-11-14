@@ -10,9 +10,9 @@ namespace Automate.Tests.Services
     [TestClass]
     public class UserServicesTests
     {
-        private UserServices userServices;
-        private Mock<IMongoDBServices> mongoDbServicesMock;
-        private Mock<IMongoCollection<User>> userCollectionMock;
+        private readonly UserServices userServices;
+        private readonly Mock<IMongoDBServices> mongoDbServicesMock;
+        private readonly Mock<IMongoCollection<User>> userCollectionMock;
 
         private readonly string UNKNOWN_USERNAME = "unknownUsername";
         private readonly string CORRECT_USERNAME = "laurentMetNous100STP";
