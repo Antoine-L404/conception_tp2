@@ -4,14 +4,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Automate"
-        xmlns:utils="clr-namespace:Automate.Utils"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib" 
-        xmlns:viewmodels="clr-namespace:Automate.ViewModels" 
         mc:Ignorable="d"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="GreenTech Serres" Height="450" Width="800" Background="#E0E0E0">
+        Title="GreenTech Serres" Height="482" Width="800" Background="#E0E0E0">
     <Grid Margin="10">
         <Grid VerticalAlignment="Top" Height="100" Background="#D3D3D3">
             <Grid.ColumnDefinitions>
@@ -50,6 +46,7 @@
                         </Button.RenderTransform>
                     </Button>
                     <Button Content="Contrôle du climat" Height="50" Width="175" IsEnabled="False"/>
+                    <Button Content="Déconnexion" Height="50" Width="175" Margin="0,10,0,0" Command="{Binding SignOutCommand}"/>
                 </StackPanel>
             </Grid>
         </StackPanel>

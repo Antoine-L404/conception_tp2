@@ -55,7 +55,13 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 
     public bool IsAdmin 
     {
-        get => Environment.authenticatedUser.Role == RoleConstants.ADMIN;
+        get 
+        {
+            if (Environment.authenticatedUser != null)
+                return Environment.authenticatedUser.Role == RoleConstants.ADMIN;
+
+            return false;
+        }
     }
 
     public CalendarViewModel(Calendar calendar, ITasksServices tasksServices, INavigationUtils navigationUtils)
