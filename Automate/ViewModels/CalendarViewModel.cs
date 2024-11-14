@@ -18,7 +18,6 @@ using System.Collections;
 using MongoDB.Driver;
 using Automate.Abstract.Services;
 using Automate.Abstract.Utils;
-using Automate.ViewModels;
 using Automate.Abstract.ViewModels;
 
 public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
@@ -167,7 +166,13 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
             {
                 List<UpcomingTask> tasks = tasksServices.GetTasksByDate(date);
                 calendarDayButton.Background = 
-                    tasks.Count > 0 ? new SolidColorBrush(Colors.LightCoral) : new SolidColorBrush(Colors.Transparent);
+                    tasks.Count > 0 ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Transparent);
+                tasks.ForEach(task => {
+                    if (task.Title == EventType.Arrosage || task.Title == EventType.Semis)
+                    {
+                        calendarDayButton.Background = new SolidColorBrush(Colors.Red);
+                    }
+                });
             }
         }
     }
