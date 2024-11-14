@@ -13,8 +13,8 @@ namespace Automate.ViewModels
         private readonly ITasksServices tasksServices;
         private Window window;
 
-        private string doesTodayHasCriticalTask;
-        public string DoesTodayHasCriticalTask
+        private string criticalTaskMessage;
+        public string CriticalTaskMessage
         {
             get
             {
@@ -25,7 +25,7 @@ namespace Automate.ViewModels
             }
             set
             {
-                doesTodayHasCriticalTask = value;
+                criticalTaskMessage = value;
             }
         }
 

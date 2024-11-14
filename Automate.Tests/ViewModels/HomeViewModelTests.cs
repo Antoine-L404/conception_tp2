@@ -1,6 +1,5 @@
 ﻿using Automate.Abstract.Services;
 using Automate.Abstract.Utils;
-using Automate.Abstract.ViewModels;
 using Automate.ViewModels;
 using Automate.Views;
 using Moq;
@@ -11,6 +10,8 @@ namespace Automate.Tests.ViewModels
     [TestClass]
     public class HomeViewModelTests
     {
+        private const string alertMessage = "ATTENTION - Il y a un événement critique prévu aujourd'hui.";
+
         private HomeViewModel? homeViewModel;
         private Mock<Window>? mockWindow;
         private Mock<INavigationUtils>? mockNavigationUtils;
@@ -42,19 +43,19 @@ namespace Automate.Tests.ViewModels
         }
 
         [TestMethod]
-        public void DoesTodayHasCriticalTask_NoCriticalTask_ReturnFalse()
+        public void CriticalTaskMessage_NoCriticalTask_ReturnFalse()
         {
             tasksServices!.Setup(x => x.DoesTodayHasCriticalTask()).Returns(false);
 
-            Assert.IsFalse(homeViewModel!.DoesTodayHasCriticalTask);
+            Assert.AreEqual(alertMessage, homeViewModel!.CriticalTaskMessage);
         }
 
         [TestMethod]
-        public void DoesTodayHasCriticalTask_HasCriticalTask_ReturnTrue()
+        public void CriticalTaskMessage_HasCriticalTask_ReturnTrue()
         {
             tasksServices!.Setup(x => x.DoesTodayHasCriticalTask()).Returns(true);
 
-            Assert.IsTrue(homeViewModel!.DoesTodayHasCriticalTask);
+            Assert.AreEqual("", homeViewModel!.CriticalTaskMessage);
         }
     }
 }
