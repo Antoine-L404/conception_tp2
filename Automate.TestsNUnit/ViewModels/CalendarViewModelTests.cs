@@ -9,7 +9,7 @@ using Moq;
 using System.ComponentModel;
 using System.Windows;
 
-namespace Automate.Tests.ViewModels
+namespace Automate.TestsNUnit.ViewModels
 {
     [Apartment(ApartmentState.STA)]
     public class CalendarViewModelTests
@@ -65,8 +65,8 @@ namespace Automate.Tests.ViewModels
         public void DateSelected_SelectedDateContainsNoTask_EventTitlesCountIsOne()
         {
             const int expectedCount = 1;
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>())).Returns(new List<UpcomingTask>());
+            calendarViewModel.SelectedDate = DateTime.Today;
+            tasksServicesMock.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>())).Returns(new List<UpcomingTask>());
 
             calendarViewModel.DateSelected();
 
@@ -76,8 +76,8 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void DateSelected_SelectedDateContainsNoTask_EventTitlesValueIsCorrect()
         {
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>())).Returns(new List<UpcomingTask>());
+            calendarViewModel.SelectedDate = DateTime.Today;
+            tasksServicesMock.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>())).Returns(new List<UpcomingTask>());
 
             calendarViewModel.DateSelected();
 
@@ -90,7 +90,7 @@ namespace Automate.Tests.ViewModels
             const int expectedCount = 1;
             SetupForValidDateSelectedOneTask();
 
-            calendarViewModel!.DateSelected();
+            calendarViewModel.DateSelected();
 
             Assert.That(calendarViewModel.EventTitles.Count, Is.EqualTo(expectedCount));
         }
@@ -101,7 +101,7 @@ namespace Automate.Tests.ViewModels
             string expectedValue = EventType.Semis.ToString();
             SetupForValidDateSelectedOneTask();
 
-            calendarViewModel!.DateSelected();
+            calendarViewModel.DateSelected();
 
             Assert.That(calendarViewModel.EventTitles[0], Is.EqualTo(expectedValue));
         }
@@ -112,7 +112,7 @@ namespace Automate.Tests.ViewModels
             const int expectedCount = 2;
             SetupForValidDateSelectedManyTasks();
 
-            calendarViewModel!.DateSelected();
+            calendarViewModel.DateSelected();
 
             Assert.That(calendarViewModel.EventTitles.Count, Is.EqualTo(expectedCount));
         }
@@ -124,7 +124,7 @@ namespace Automate.Tests.ViewModels
             string expectedTask2 = EventType.Entretien.ToString();
             SetupForValidDateSelectedManyTasks();
 
-            calendarViewModel!.DateSelected();
+            calendarViewModel.DateSelected();
 
             Assert.That(calendarViewModel.EventTitles[0], Is.EqualTo(expectedTask1));
             Assert.That(calendarViewModel.EventTitles[1], Is.EqualTo(expectedTask2));
@@ -133,9 +133,9 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void AddTask_SelectedDateInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.AddTask();
+            calendarViewModel.AddTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.True);
+            Assert.That(calendarViewModel.HasErrors, Is.True);
         }
 
         [Test]
@@ -143,9 +143,9 @@ namespace Automate.Tests.ViewModels
         {
             const string argPropertyName = "ErrorMessages";
 
-            calendarViewModel!.AddTask();
+            calendarViewModel.AddTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.Once()
             );
@@ -156,9 +156,9 @@ namespace Automate.Tests.ViewModels
         {
             SetupForValidAddTask();
 
-            calendarViewModel!.AddTask();
+            calendarViewModel.AddTask();
 
-            tasksServicesMock!.Verify(x => x.CreateTask(It.IsAny<UpcomingTask>()), Times.Once());
+            tasksServicesMock.Verify(x => x.CreateTask(It.IsAny<UpcomingTask>()), Times.Once());
         }
 
         [Test]
@@ -167,7 +167,7 @@ namespace Automate.Tests.ViewModels
             const int expectedCount = 1;
             SetupForValidAddTask();
 
-            calendarViewModel!.AddTask();
+            calendarViewModel.AddTask();
 
             Assert.That(calendarViewModel.EventTitles.Count, Is.EqualTo(expectedCount));
         }
@@ -178,7 +178,7 @@ namespace Automate.Tests.ViewModels
             string expectedValue = EventType.Semis.ToString();
             SetupForValidAddTask();
 
-            calendarViewModel!.AddTask();
+            calendarViewModel.AddTask();
 
             Assert.That(calendarViewModel.EventTitles[0], Is.EqualTo(expectedValue));
         }
@@ -189,9 +189,9 @@ namespace Automate.Tests.ViewModels
             const string argPropertyName = "SuccessMessage";
             SetupForValidAddTask();
 
-            calendarViewModel!.AddTask();
+            calendarViewModel.AddTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.AtLeastOnce()
             );
@@ -200,9 +200,9 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void EditTask_SelectedDateInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.EditTask();
+            calendarViewModel.EditTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.True);
+            Assert.That(calendarViewModel.HasErrors, Is.True);
         }
 
         [Test]
@@ -210,9 +210,9 @@ namespace Automate.Tests.ViewModels
         {
             const string argPropertyName = "ErrorMessages";
 
-            calendarViewModel!.EditTask();
+            calendarViewModel.EditTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.Once()
             );
@@ -221,22 +221,22 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void EditTask_SelectedEventTitleInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.SelectedDate = DateTime.Today;
+            calendarViewModel.SelectedDate = DateTime.Today;
 
             calendarViewModel.EditTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.True);
+            Assert.That(calendarViewModel.HasErrors, Is.True);
         }
 
         [Test]
         public void EditTask_SelectedEventTitleInvalid_OnPropertyChangedIsInvoked()
         {
             const string argPropertyName = "ErrorMessages";
-            calendarViewModel!.SelectedDate = DateTime.Today;
+            calendarViewModel.SelectedDate = DateTime.Today;
 
             calendarViewModel.EditTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.AtLeastOnce()
             );
@@ -245,24 +245,24 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void EditTask_TaskToEditInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedEventTitle = EventType.Semis.ToString();
             calendarViewModel.SelectedDate = DateTime.Today;
 
             calendarViewModel.EditTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.True);
+            Assert.That(calendarViewModel.HasErrors, Is.True);
         }
 
         [Test]
         public void EditTask_TaskToEditInvalid_OnPropertyChangedIsInvoked()
         {
             const string argPropertyName = "ErrorMessages";
-            calendarViewModel!.SelectedDate = DateTime.Today;
+            calendarViewModel.SelectedDate = DateTime.Today;
             calendarViewModel.SelectedEventTitle = EventType.Entretien.ToString();
 
             calendarViewModel.EditTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.AtLeastOnce()
             );
@@ -273,9 +273,9 @@ namespace Automate.Tests.ViewModels
         {
             SetupForValidEditTask();
 
-            calendarViewModel!.EditTask();
+            calendarViewModel.EditTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.False);
+            Assert.That(calendarViewModel.HasErrors, Is.False);
         }
 
         [Test]
@@ -283,9 +283,9 @@ namespace Automate.Tests.ViewModels
         {
             SetupForValidEditTask();
 
-            calendarViewModel!.EditTask();
+            calendarViewModel.EditTask();
 
-            tasksServicesMock!.Verify(
+            tasksServicesMock.Verify(
                 x => x.UpdateTask(It.IsAny<ObjectId>(), It.IsAny<UpdateDefinition<UpcomingTask>>()), Times.Once());
         }
 
@@ -295,7 +295,7 @@ namespace Automate.Tests.ViewModels
             const int expectedCount = 1;
             SetupForValidEditTask();
 
-            calendarViewModel!.EditTask();
+            calendarViewModel.EditTask();
 
             Assert.That(calendarViewModel.EventTitles.Count, Is.EqualTo(expectedCount));
         }
@@ -306,7 +306,7 @@ namespace Automate.Tests.ViewModels
             string expectedValue = EventType.Semis.ToString();
             SetupForValidEditTask();
 
-            calendarViewModel!.EditTask();
+            calendarViewModel.EditTask();
 
             Assert.That(calendarViewModel.EventTitles[0], Is.EqualTo(expectedValue));
         }
@@ -317,9 +317,9 @@ namespace Automate.Tests.ViewModels
             const string argPropertyName = "SuccessMessage";
             SetupForValidEditTask();
 
-            calendarViewModel!.EditTask();
+            calendarViewModel.EditTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.AtLeastOnce()
             );
@@ -328,9 +328,9 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void DeleteTask_SelectedDateInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.DeleteTask();
+            calendarViewModel.DeleteTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.True);
+            Assert.That(calendarViewModel.HasErrors, Is.True);
         }
 
         [Test]
@@ -338,9 +338,9 @@ namespace Automate.Tests.ViewModels
         {
             const string argPropertyName = "ErrorMessages";
 
-            calendarViewModel!.DeleteTask();
+            calendarViewModel.DeleteTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.Once()
             );
@@ -349,22 +349,22 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void DeleteTask_SelectedEventTitleInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.SelectedDate = DateTime.Today;
+            calendarViewModel.SelectedDate = DateTime.Today;
 
             calendarViewModel.DeleteTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.True);
+            Assert.That(calendarViewModel.HasErrors, Is.True);
         }
 
         [Test]
         public void DeleteTask_SelectedEventTitleInvalid_OnPropertyChangedIsInvoked()
         {
             const string argPropertyName = "ErrorMessages";
-            calendarViewModel!.SelectedDate = DateTime.Today;
+            calendarViewModel.SelectedDate = DateTime.Today;
 
             calendarViewModel.DeleteTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.AtLeastOnce()
             );
@@ -373,24 +373,24 @@ namespace Automate.Tests.ViewModels
         [Test]
         public void DeleteTask_TaskToDeleteInvalid_AddErrorToErrorsCollection()
         {
-            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedEventTitle = EventType.Semis.ToString();
             calendarViewModel.SelectedDate = DateTime.Today;
 
             calendarViewModel.DeleteTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.True);
+            Assert.That(calendarViewModel.HasErrors, Is.True);
         }
 
         [Test]
         public void DeleteTask_TaskToDeleteInvalid_OnPropertyChangedIsInvoked()
         {
             const string argPropertyName = "ErrorMessages";
-            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedEventTitle = EventType.Semis.ToString();
             calendarViewModel.SelectedDate = DateTime.Today;
 
             calendarViewModel.DeleteTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.AtLeastOnce()
             );
@@ -401,9 +401,9 @@ namespace Automate.Tests.ViewModels
         {
             SetupForValidDeleteTask();
 
-            calendarViewModel!.DeleteTask();
+            calendarViewModel.DeleteTask();
 
-            Assert.That(calendarViewModel!.HasErrors, Is.False);
+            Assert.That(calendarViewModel.HasErrors, Is.False);
         }
 
         [Test]
@@ -411,9 +411,9 @@ namespace Automate.Tests.ViewModels
         {
             SetupForValidDeleteTask();
 
-            calendarViewModel!.DeleteTask();
+            calendarViewModel.DeleteTask();
 
-            tasksServicesMock!.Verify(x => x.DeleteTask(It.IsAny<ObjectId>()), Times.Once());
+            tasksServicesMock.Verify(x => x.DeleteTask(It.IsAny<ObjectId>()), Times.Once());
         }
 
         [Test]
@@ -422,9 +422,9 @@ namespace Automate.Tests.ViewModels
             const string argPropertyName = "SuccessMessage";
             SetupForValidDeleteTask();
 
-            calendarViewModel!.DeleteTask();
+            calendarViewModel.DeleteTask();
 
-            propertyChangedMock!.Verify(x =>
+            propertyChangedMock.Verify(x =>
                 x.Invoke(It.IsAny<object>(), It.Is<PropertyChangedEventArgs>(args => args.PropertyName == argPropertyName)),
                 Times.AtLeastOnce()
             );
@@ -434,8 +434,8 @@ namespace Automate.Tests.ViewModels
         {
             UpcomingTask returnedTask = new UpcomingTask() { Title = EventType.Semis };
 
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
+            calendarViewModel.SelectedDate = DateTime.Today;
+            tasksServicesMock.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
                 .Returns(new List<UpcomingTask>() { returnedTask });
         }
 
@@ -444,8 +444,8 @@ namespace Automate.Tests.ViewModels
             UpcomingTask returnedTask1 = new UpcomingTask() { Title = EventType.Semis };
             UpcomingTask returnedTask2 = new UpcomingTask() { Title = EventType.Entretien };
 
-            calendarViewModel!.SelectedDate = DateTime.Today;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
+            calendarViewModel.SelectedDate = DateTime.Today;
+            tasksServicesMock.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
                 .Returns(new List<UpcomingTask>() { returnedTask1, returnedTask2 });
         }
 
@@ -454,10 +454,10 @@ namespace Automate.Tests.ViewModels
             SetupForValidDateSelectedOneTask();
 
             DateTime selectedDate = DateTime.Today;
-            calendarViewModel!.SelectedDate = selectedDate;
+            calendarViewModel.SelectedDate = selectedDate;
 
-            taskFormViewModelMock!.Setup(x => x.SelectedEventType).Returns(EventType.Semis);
-            navigationUtilsMock!.Setup(x => x.GetTaskFormValues(selectedDate, null)).Returns(taskFormViewModelMock.Object);
+            taskFormViewModelMock.Setup(x => x.SelectedEventType).Returns(EventType.Semis);
+            navigationUtilsMock.Setup(x => x.GetTaskFormValues(selectedDate, null)).Returns(taskFormViewModelMock.Object);
         }
 
         private void SetupForValidEditTask()
@@ -466,16 +466,16 @@ namespace Automate.Tests.ViewModels
 
             DateTime selectedDate = DateTime.Today;
 
-            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedEventTitle = EventType.Semis.ToString();
             calendarViewModel.SelectedDate = selectedDate;
 
             UpcomingTask existingTask = new UpcomingTask() { Title = EventType.Semis };
-            calendarViewModel!.SelectedDate = selectedDate;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
+            calendarViewModel.SelectedDate = selectedDate;
+            tasksServicesMock.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
                 .Returns(new List<UpcomingTask>() { existingTask });
 
-            taskFormViewModelMock!.Setup(x => x.SelectedEventType).Returns(EventType.Arrosage);
-            navigationUtilsMock!.Setup(
+            taskFormViewModelMock.Setup(x => x.SelectedEventType).Returns(EventType.Arrosage);
+            navigationUtilsMock.Setup(
                 x => x.GetTaskFormValues(selectedDate, It.IsAny<EventType>())).Returns(taskFormViewModelMock.Object);
 
             calendarViewModel.DateSelected();
@@ -487,12 +487,12 @@ namespace Automate.Tests.ViewModels
 
             DateTime selectedDate = DateTime.Today;
 
-            calendarViewModel!.SelectedEventTitle = EventType.Semis.ToString();
+            calendarViewModel.SelectedEventTitle = EventType.Semis.ToString();
             calendarViewModel.SelectedDate = selectedDate;
 
             UpcomingTask existingTask = new UpcomingTask() { Title = EventType.Semis };
-            calendarViewModel!.SelectedDate = selectedDate;
-            tasksServicesMock!.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
+            calendarViewModel.SelectedDate = selectedDate;
+            tasksServicesMock.Setup(x => x.GetTasksByDate(It.IsAny<DateTime>()))
                 .Returns(new List<UpcomingTask>() { existingTask });
 
             calendarViewModel.DateSelected();
