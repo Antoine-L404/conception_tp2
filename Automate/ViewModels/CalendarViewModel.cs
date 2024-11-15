@@ -49,7 +49,7 @@ public class CalendarViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
     }
     public string? SuccessMessage { get; set; }
 
-    public DateTime? SelectedDate { get; set; }
+    public DateTime? SelectedDate { get; set; } = DateTime.Today;
     public string? SelectedEventTitle { get; set; }
     public Calendar Calendar { get; set; }
     public ObservableCollection<string> EventTitles { get; set; } = new ObservableCollection<string>();
